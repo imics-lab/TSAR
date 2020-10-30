@@ -4,6 +4,7 @@
 #Identify and review a portion of a dataset most likely to be mislabeled
 
 import numpy as np
+from utils.build_AE import get_trained_sfe, get_trained_AE
 
 #Source from Labelfix repository
 # def _get_indices(pred, y):
@@ -29,3 +30,13 @@ def sort_indices(pred_y, true_y):
     closeness = [np.dot(pred_y[i], true_y[i]) for i in range(pred_y.shape[0])]
     indices = np.argsort(closeness)
     return indices
+
+def get_unsupervised_features(X):
+    ae = get_trained_AE(X)
+    feat = ae.predict(X)
+    return feat
+
+def get_supervised_features(X, y):
+    sfe = get_trained_sfe(X, y)
+    feat = sfe.predict(X)
+    return feat
