@@ -33,14 +33,18 @@ def sort_indices(pred_y, true_y):
     indices = np.argsort(closeness)
     return indices
 
-def get_unsupervised_features(X):
+def get_unsupervised_features(X, saveToFile=False, filename="unsup_features.csv"):
     ae = get_trained_AE(X)
     feat = ae.predict(X)
+    if saveToFile:
+        np.savetxt(filename, feat, delimiter=",")
     return feat
 
-def get_supervised_features(X, y):
+def get_supervised_features(X, y, saveToFile=False, filename="sup_features.csv"):
     sfe = get_trained_sfe(X, y)
     feat = sfe.predict(X)
+    if saveToFile:
+        np.savetxt(filename, feat, delimiter=",")
     return feat
 
 def preprocess_raw_data_and_labels(X, y):
@@ -50,5 +54,45 @@ def preprocess_raw_data_and_labels(X, y):
         return
     m = np.max(X)
     X = (X/m)
-    if len(y[0]) == 1:
+    if y.ndim == 1:
         y = to_categorical(y)
+
+    return X,y
+
+def count_class_imbalance(y):
+    if y.ndim == 1:
+        y = to_categorical(y)
+
+    counts = np.zeros(len(y[0]))
+    for i in range(len(y[0])):
+        print(np.sum(y[:,i]))
+        counts[i] = np.sum(y[:,i])
+
+    #print("Most prevalent class: {}".format(np.max(counts)))
+    #print("Least prevalent class: {}".format(np.min(counts)))
+    return np.max(counts)/np.min(counts)
+
+def check_dataset(X, y, featureType='u'):
+    if featureType not in ['u', 's', 'o']:
+        print("featureType must be u, s, or o")
+        return
+
+    print("Checking dataset for suspicious labels")
+    
+
+if __name__ == "__main__":
+    y = np.array([0, 1, 2, 0, 1])
+    print("Class imbalance: ", count_class_imbalance(y))
+    X = [
+        [1, 2, 3, 4, 5],
+        [5, 4, 3, 2, 1],
+        [1, 1, 1, 1, 1],
+        [1, 2, 3, 4, 5],
+        [5, 4, 3, 2, 1]
+    ]
+
+    X, y = preprocess_raw_data_and_labels(X, y)
+    print(X)
+    print(y)
+
+    check_dataset(X, y)
