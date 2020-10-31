@@ -4,7 +4,8 @@
 #Identify and review a portion of a dataset most likely to be mislabeled
 
 import numpy as np
-from ...utils.build_AE import get_trained_sfe, get_trained_AE
+from utils.build_AE import get_trained_AE
+from utils.build_sup_extractor import get_trained_sfe
 from tensorflow.keras.utils import to_categorical
 
 #Source from Labelfix repository
