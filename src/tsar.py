@@ -4,7 +4,8 @@
 #Identify and review a portion of a dataset most likely to be mislabeled
 
 import numpy as np
-from utils.build_AE import get_trained_sfe, get_trained_AE
+from ...utils.build_AE import get_trained_sfe, get_trained_AE
+from tensorflow.keras.utils import to_categorical
 
 #Source from Labelfix repository
 # def _get_indices(pred, y):
@@ -40,3 +41,13 @@ def get_supervised_features(X, y):
     sfe = get_trained_sfe(X, y)
     feat = sfe.predict(X)
     return feat
+
+def preprocess_raw_data_and_labels(X, y):
+    print("Applying pre-processing")
+    if len(X) != len(y):
+        print("Data and labels must have same number of instances")
+        return
+    m = np.max(X)
+    X = (X/m)
+    if len(y[0]) == 1:
+        y = to_categorical(y)
