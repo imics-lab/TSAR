@@ -8,6 +8,7 @@ from utils.build_AE import get_trained_AE
 from utils.build_sup_extractor import get_trained_sfe
 from utils.build_simple_dnn import get_trained_dnn
 from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.callbacks import EarlyStopping
 
 #Source from Labelfix repository
 # def _get_indices(pred, y):
