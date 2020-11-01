@@ -6,6 +6,7 @@
 import numpy as np
 from utils.build_AE import get_trained_AE
 from utils.build_sup_extractor import get_trained_sfe
+from utils.build_simple_dnn import get_trained_dnn
 from tensorflow.keras.utils import to_categorical
 
 #Source from Labelfix repository
@@ -73,12 +74,31 @@ def count_class_imbalance(y):
     return np.max(counts)/np.min(counts)
 
 def check_dataset(X, y, featureType='u'):
-    if featureType not in ['u', 's', 'o']:
+
+    print("Checking dataset for suspicious labels")
+    if featureType=='u':
+        model = get_trained_AE(X)
+        feats = model.predict(X)
+        feats, y = preprocess_raw_data_and_labels(X, y)
+    elif featureType=='s':
+        model = get_trained_sfe(X,y)
+        feats = model.predict(X)
+        feats, y = preprocess_raw_data_and_labels(X,y)
+    elif featureType=='o':
+        feats, y = preprocess_raw_data_and_labels(X,y)
+    else:
         print("featureType must be u, s, or o")
         return
 
-    print("Checking dataset for suspicious labels")
-    
+    c = get_trained_dnn(feats, y)
+    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=5)
+    c.fit(X, y, epochs=50, verbose=1, callbacks=[es], validation_split=0.1, batch_size=10)
+
+    y_pred = c.predict(feats)
+
+    return sort_indices(y_pred, y)
+
+
 
 if __name__ == "__main__":
     y = np.array([0, 1, 2, 0, 1])
@@ -95,4 +115,5 @@ if __name__ == "__main__":
     print(X)
     print(y)
 
-    check_dataset(X, y)
+    indices = check_dataset(X, y)
+    print("worst index: ", indices[0])
