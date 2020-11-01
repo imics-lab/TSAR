@@ -54,7 +54,8 @@ def train_dnn(dnn, X, y, withEvaluation=False):
     return dnn
 
 def get_trained_dnn(X, y):
-    dnn = build_dnn(X[0])
+    numLabels = y.shape[0]
+    dnn = build_dnn(X[0], num_labels=numLabels)
     dnn = train_dnn(dnn, X, y)
     return dnn
 

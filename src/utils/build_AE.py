@@ -19,22 +19,28 @@ from matplotlib import pyplot as plt
 
 def build_AE(train_example, features_per_channel=30):
     print("Input shape: ", train_example.shape)
+    s=[1,1]
+    if train_example.ndim==1:
+        s[1] = len(train_example)
+    else:
+        s[0] = train_example.shape[0]
+        s[1] = train_example.shape[1]
     model = Sequential([
         Input(shape=train_example.shape),
         BatchNormalization(scale=False),
-        Reshape((train_example.shape[0], train_example.shape[1])),
+        Reshape((s[0], s[1])),
         Conv1D(filters=128, kernel_size=16, activation='relu', padding='same'),
         Conv1D(filters=128, kernel_size=16, activation='relu', padding='same'),
         MaxPooling1D(pool_size=(128), data_format='channels_first'),
         Flatten(),
-        Dense(features_per_channel*train_example.shape[0], activation='softmax', name='Embedding'),
-        Reshape((features_per_channel,train_example.shape[0])),
+        Dense(features_per_channel*s[0], activation='softmax', name='Embedding'),
+        Reshape((features_per_channel,s[0])),
         Conv1DTranspose(filters=128, activation='relu', kernel_size=16, padding='same'),
         Conv1DTranspose(filters=128, activation='relu', kernel_size=16, padding='same'),
         BatchNormalization(),
         Flatten(),
-        Dense(train_example.shape[0] * train_example.shape[1], activation='linear'),
-        Reshape((train_example.shape[0], train_example.shape[1]))
+        Dense(s[0] * s[1], activation='linear'),
+        Reshape((s[0],s[1]))
     ])
     model.compile(optimizer='RMSprop', loss='mean_squared_error', metrics=[])
     #model.summary()
