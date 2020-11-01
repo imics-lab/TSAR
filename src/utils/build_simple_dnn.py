@@ -30,7 +30,7 @@ def build_dnn(train_example, num_labels=2):
         Dense(64, activation='sigmoid'),
         Dense(num_labels, activation='softmax')
     ])
-    model.compile(optimizer='RMSprop', loss='categorical_crossentropy', metrics=[acc])
+    model.compile(optimizer='RMSprop', loss='categorical_crossentropy', metrics=['acc'])
     model.summary()
     print("Output shape: ", model.output.shape)
     return model
@@ -51,7 +51,7 @@ def train_dnn(dnn, X, y, withEvaluation=False):
         print("Confuxion matrix: ")
         print(mat)
 
-    return sfe
+    return dnn
 
 def get_trained_dnn(X, y):
     dnn = build_dnn(X[0])
@@ -67,10 +67,10 @@ if __name__ == "__main__":
     print("label shape: ", y.shape)
     norm = np.max(X)
     X = X/norm
-    X = np.resize(X, (len(X), 1, len(X[0])))
+    #X = np.resize(X, (len(X), 1, len(X[0])))
     print("labels", y)
 
     dnn = build_dnn(X[0], num_labels=3)
-    dnn = train_dnn(sfe, X, y, withEvaluation=True)
+    dnn = train_dnn(dnn, X, y, withEvaluation=True)
     predict = dnn.predict(X)
     print("Output feature set: ", predict.shape)
