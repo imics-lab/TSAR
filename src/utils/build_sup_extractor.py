@@ -22,17 +22,23 @@ from tensorflow.keras.utils import to_categorical
 
 def build_sfe(train_example, features_per_channel=30, num_labels=2):
     print("Input shape: ", train_example.shape)
+    s=[1,1]
+    if train_example.ndim==1:
+        s[1] = len(train_example)
+    else:
+        s[0] = train_example.shape[0]
+        s[1] = train_example.shape[1]
     model = Sequential([
         Input(shape=train_example.shape),
         BatchNormalization(scale=False),
-        Reshape((train_example.shape[0], train_example.shape[1])),
+        Reshape((s[0], s[1])),
         Conv1D(filters=128, kernel_size=16, activation='relu', padding='same'),
         Conv1D(filters=128, kernel_size=16, activation='relu', padding='same'),
         MaxPooling1D(pool_size=(128), data_format='channels_first'),
         Flatten(),
-        Dense(features_per_channel*train_example.shape[0], activation='sigmoid', name='Embedding'),
-        Dense(features_per_channel*train_example.shape[0], activation='sigmoid'),
-        Dense(features_per_channel*train_example.shape[0]/2, activation='sigmoid'),
+        Dense(features_per_channel*s[0], activation='sigmoid', name='Embedding'),
+        Dense(features_per_channel*s[0], activation='sigmoid'),
+        Dense(features_per_channel*s[0]/2, activation='sigmoid'),
         Dense(num_labels, activation='softmax')
     ])
     model.compile(optimizer='RMSprop', loss='mse', metrics=[])
@@ -67,7 +73,8 @@ def train_sfe(sfe, X, y, withEvaluation=False):
     return sfe
 
 def get_trained_sfe(X, y):
-    sfe = build_sfe(X[0])
+    numLabels = y.shape[1]
+    sfe = build_sfe(X[0], num_labels=numLabels)
     sfe = train_sfe(sfe, X, y)
     return sfe
 

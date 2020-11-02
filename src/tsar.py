@@ -7,8 +7,13 @@ import numpy as np
 from utils.build_AE import get_trained_AE
 from utils.build_sup_extractor import get_trained_sfe
 from utils.build_simple_dnn import get_trained_dnn
+from utils.color_pal import color_pallette_big as pal
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.callbacks import EarlyStopping
+import ipywidgets as widgets
+from IPython.display import display
+from matplotlib import pyplot as plt
+
 
 #Source from Labelfix repository
 # def _get_indices(pred, y):
@@ -99,10 +104,81 @@ def check_dataset(X, y, featureType='u'):
 
     return sort_indices(y_pred, y)
 
+def _on_button_clicked_correct(b):
+    print("correct")
+
+def _on_button_clicked_mislabeled(b):
+    print("mislabeled")
+
+def review_dataset(X, y, featureType='u', percentReview=0.2):
+    print("Starting manual review process")
+    print("X: ", X)
+    print("y: ", y)
+    indices = check_dataset(X, y, featureType=featureType)
+    i = int(len(X) * percentReview)
+    sus_set = indices[0:i]
+    good_set = indices[i:len(X)]
+
+    buttonC = widgets.Button(description="Correct")
+    buttonM = widgets.Button(description="Mislabeled")
+    output = widgets.Output()
+
+    buttonC.on_click(_on_button_clicked_correct)
+    buttonM.on_click(_on_button_clicked_mislabeled)
+
+    display(buttonC, buttonM, output)
+
+    y_flat = np.argmax(y, axis=1)
+
+    print("sus set: ", sus_set)
+    print("y flat: ", y_flat)
+
+    point = sus_set[0]
+    sus_label = y_flat[point]
+
+    print("Point: ", point)
+    print("sus label: ", sus_label)
+
+    figure = plt.figure(1, figsize=(15,10))
+    ax1 = plt.subplot2grid((3,4), (0,0), colspan=3, rowspan=3)
+    ax2 = plt.subplot2grid((3,4), (0, 3))
+    ax3 = plt.subplot2grid((3,4), (1, 3))
+    ax4 = plt.subplot2grid((3,4), (2, 3))
+
+    NUM_LABELS = y.shape[1]
+
+    for i in range(NUM_LABELS):
+        x = np.where(y==i)
+        ax1.scatter(X[x, 0], X[x, 1], s=6, c=pal[i], marker=".")
+    ax1.scatter(X[point, 0], X[point, 1], s=200, c=pal[sus_label], marker="X")
+    ax1.set_title("tSNE of extracted features")
+    ax1.legend()
+    ax1.axis('off')
+
+
+    # ax2.plot(range(0, len(X[random_point, 0, :])), X[random_point, 0, :], c=pal[sus_label])
+    # ax2.plot(range(0, len(X[random_point, 1, :])), X[random_point, 1, :], c=pal[sus_label])
+    # ax2.plot(range(0, len(X[random_point, 2, :])), X[random_point, 2, :], c=pal[sus_label])
+    # ax2.set_title("Suspicious point with label: " + str([sus_label]))
+
+    # ax3.plot(range(0, NUM_SAMPLES), X[nn, 0, :], c=pal[y[nn]])
+    # ax3.plot(range(0, NUM_SAMPLES), X[nn, 1, :], c=pal[y[nn]])
+    # ax3.plot(range(0, NUM_SAMPLES), X[nn, 2, :], c=pal[y[nn]])
+    # ax3.set_title("Nearest neighbor has label: " + str(labels[y[nn]]))
+
+    # ax4.plot(range(0, NUM_SAMPLES), rep_signal[0,:], c=pal[sus_label])
+    # ax4.plot(range(0, NUM_SAMPLES), rep_signal[1,:], c=pal[sus_label])
+    # ax4.plot(range(0, NUM_SAMPLES), rep_signal[2,:], c=pal[sus_label])
+    # ax4.set_title("Another point with label: " + str(labels[sus_label]))
+    #plt.savefig("/content/drive/My Drive/LabelReview/set_"+s+"_ae_example_figure.pdf")
+
+    plt.tight_layout()
+    plt.show()
+
 
 
 if __name__ == "__main__":
-    y = np.array([0, 1, 2, 0, 1])
+    y = np.array([0, 1, 2, 0, 1], dtype='int')
     print("Class imbalance: ", count_class_imbalance(y))
     X = [
         [1, 2, 3, 4, 5],
@@ -116,5 +192,5 @@ if __name__ == "__main__":
     print(X)
     print(y)
 
-    indices = check_dataset(X, y)
-    print("worst index: ", indices[0])
+    review_dataset(X, y, featureType='u')
+    #print("worst index: ", indices[0])
