@@ -144,6 +144,17 @@ def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, 
     if show:
         plt.show()
 
+def add_noise_to_labels(y, percentNoise=5, saveToFile=False, filename="noisy_labels.csv"):
+    bad = np.array()
+    NUM_LABELS = int(np.max(y)+1)
+    if y.ndim>=2:
+        y = np.argmax(y, axis=-1)
+    for i in range(len(y)):
+        if rand.randint < percentNoise:
+            y[i] = (y[il + rand.randint(1,NUM_LABELS)) % NUM_LABELS
+            bad = numpy.append(y, i)
+    return y, bad
+
 def count_class_imbalance(y):
     if y.ndim == 1:
         y = to_categorical(y)
