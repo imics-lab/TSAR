@@ -71,7 +71,7 @@ def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, 
         if X.ndim > 2:
             print("This raw data cannot be visualized with tSNE")
             return
-        vis = tsne(n_components=2, n_jobs=8).fit_transform(X)
+        vis = tsne(n_components=2, n_jobs=8).fit_transform(feat)
     if neighbors==None:
         nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(feat)
         distances, neighbors = nbrs.kneighbors(feat)
