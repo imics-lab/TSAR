@@ -30,6 +30,7 @@ def get_uci_data():
     X[:,1,:]=X_y[:,:]
     X[:,2,:]=X_z[:,:]
     y = np.genfromtxt("data/UCI HAR Dataset/train/y_train.txt")
+    y = np.array(y - 1)
     with open("data/UCI HAR Dataset/activity_labels.txt") as f:
         labels = f.read().split('\n')
     labels = labels[:-1]

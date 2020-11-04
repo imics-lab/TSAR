@@ -11,6 +11,12 @@ from utils.ts_feature_toolkit import get_features_for_set
 from import_datasets import get_unimib_data, get_uci_data
 from sklearn.manifold import TSNE as tsne
 
+def add_label_noise_to_set(y, percentNoise=5, saveToFile=False, filename="noisy_labels.csv"):
+    bad = np.array()
+    for i in y:
+        if rand.randint < percentNoise:
+            #do the mislabel
+
 if __name__ == "__main__":
     print("Preparing 54 visualizations of clean data...")
     print("---UniMiB---")
@@ -98,13 +104,13 @@ if __name__ == "__main__":
     for i in range(3):
         instance = rand.randint(0, len(X))
         print(i+1,": point ", instance)
-        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_"+s+"_trad_correct_"+str(i)+".png", False)
+        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_trad_correct_"+str(i)+".png", False)
 
     print("Mislabeled")
     for i in range(3):
         instance = rand.randint(0, len(X))
         print(i+1,": point ", instance)
-        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_"+s+"_trad_mislabeled_"+str(i)+".png", True)
+        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_trad_mislabeled_"+str(i)+".png", True)
 
     print("Supervised Features")
     feat = get_supervised_features(X, y)
@@ -115,13 +121,13 @@ if __name__ == "__main__":
     for i in range(3):
         instance = rand.randint(0, len(X))
         print(i+1,": point ", instance)
-        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_"+s+"_sup_correct_"+str(i)+".png", False)
+        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_sup_correct_"+str(i)+".png", False)
 
     print("Mislabeled")
     for i in range(3):
         instance = rand.randint(0, len(X))
         print(i+1,": point ", instance)
-        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_"+s+"_sup_mislabeled_"+str(i)+".png", True)
+        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_sup_mislabeled_"+str(i)+".png", True)
 
     print("Unsupervised Features")
     feat = get_unsupervised_features(X)
@@ -132,10 +138,12 @@ if __name__ == "__main__":
     for i in range(3):
         instance = rand.randint(0, len(X))
         print(i+1,": point ", instance)
-        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_"+s+"_unsup_correct_"+str(i)+".png", False)
+        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_unsup_correct_"+str(i)+".png", False)
 
     print("Mislabeled")
     for i in range(3):
         instance = rand.randint(0, len(X))
         print(i+1,": point ", instance)
-        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_"+s+"_unsup_mislabeled_"+str(i)+".png", True)
+        print_graph_for_instance(X, y, labels, instance, feat, neighbors, vis, False, True, "imgs/uci_unsup_mislabeled_"+str(i)+".png", True)
+
+    print("Finished")
