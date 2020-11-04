@@ -63,35 +63,42 @@ def get_NN_for_dataset(X, saveToFile=False, filename="nn.csv"):
         np.savetxt(filename, feat, delimiter=",")
     return indices
 
-def print_graph_for_instance(X, y, labels, instance, feat=NULL, neighbors=NULL, vis=NULL, show=False, saveToFile=False, filename="graph.pdf"){
-    if feat==NULL:
+def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, vis=None, show=False, saveToFile=False, filename="graph.pdf"):
+
+    if feat==None:
         feat = X
-    if vis==NULL:
+    if vis==None:
         if X.ndim > 2:
             print("This raw data cannot be visualized with tSNE")
             return
-        vis = tsne(feat)
-    if nn==NULL:
+        vis = tsne(n_components=2, n_jobs=8).fit_transform(X)
+    if neighbors==None:
         nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(feat)
         distances, neighbors = nbrs.kneighbors(feat)
 
-    if np.max(labels) > 4:
+    if np.max(y) > 4:
         pal = color_pallette_big
     else:
         pal = color_pallette_small
 
     if X.ndim == 2:
-        X = np.reshape((X.shape[0], 1, X.shape[1]))
+        X = np.reshape(X, (X.shape[0], 1, X.shape[1]))
 
-    rep_signal = X[np.where(y==sus_label)][0,:,:]
+    print(vis)
 
-    nn = neighbors[random_point, 1]
-    sus_label = y[instance]
+    nn = neighbors[instance, 1]
+    sus_label = np.argmax(y[instance])
+    print(sus_label)
+    #rep_signal = X[np.where(y==sus_label)][0,:,:]
+    rep_signal = X[0, : , :]
 
     ax1 = plt.subplot2grid((3,4), (0,0), colspan=3, rowspan=3)
     ax2 = plt.subplot2grid((3,4), (0, 3))
     ax3 = plt.subplot2grid((3,4), (1, 3))
     ax4 = plt.subplot2grid((3,4), (2, 3))
+
+    NUM_LABELS = int(np.max(y)+1)
+    NUM_SAMPLES = X.shape[2]
 
     for i in range(NUM_LABELS):
         x = np.where(y==i)
@@ -101,11 +108,25 @@ def print_graph_for_instance(X, y, labels, instance, feat=NULL, neighbors=NULL, 
     ax1.legend()
     ax1.axis('off')
 
-    ax2.plot(range(0, len(X[instance, 0, :])), X[instance, 0, :], c=pal[sus_label])
-    ax2.plot(range(0, len(X[random_point, 1, :])), X[random_point, 1, :], c=pal[sus_label])
-    ax2.plot(range(0, len(X[random_point, 2, :])), X[random_point, 2, :], c=pal[sus_label])
+    for i in range(X.shape[1]):
+        ax2.plot(range(0, NUM_SAMPLES), X[instance, 0, :], c=pal[sus_label])
     ax2.set_title("Suspicious point with label: " + str(labels[sus_label]))
-}
+
+    for i in range(X.shape[1]):
+        ax3.plot(range(0, NUM_SAMPLES), X[nn, i, :], c=pal[np.argmax(y[nn])])
+    ax3.set_title("Nearest neighbor has label: " + str(labels[np.argmax(y[nn])]))
+
+    for i in range(X.shape[1]):
+        ax4.plot(range(0, NUM_SAMPLES), rep_signal[i,:], c=pal[sus_label])
+    ax4.set_title("Another point with label: " + str(labels[sus_label]))
+
+    plt.tight_layout()
+
+    if saveToFile:
+        plt.savefig(filename)
+
+    if show:
+        plt.show()
 
 def preprocess_raw_data_and_labels(X, y):
     print("Applying pre-processing")
@@ -169,5 +190,8 @@ if __name__ == "__main__":
     print(X)
     print(y)
 
-    review_dataset(X, y, featureType='u')
-    #print("worst index: ", indices[0])
+    indices = check_dataset(X, y, featureType='u')
+    print("worst index: ", indices[0])
+    labels = ['type one', 'type two', 'type three']
+    print("Plotting index 0:")
+    print_graph_for_instance(X, y, labels, instance=indices[0], show=True)
