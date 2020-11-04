@@ -7,13 +7,14 @@ import numpy as np
 from utils.build_AE import get_trained_AE
 from utils.build_sup_extractor import get_trained_sfe
 from utils.build_simple_dnn import get_trained_dnn
-from utils.color_pal import color_pallette_big as pal
+from utils.color_pal import color_pallette_big, color_pallette_small
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.callbacks import EarlyStopping
 import ipywidgets as widgets
 from IPython.display import display
 from matplotlib import pyplot as plt
 from sklearn.neighbors import NearestNeighbors
+from sklearn.manifold import TSNE as tsne
 
 
 #Source from Labelfix repository
@@ -61,6 +62,50 @@ def get_NN_for_dataset(X, saveToFile=False, filename="nn.csv"):
     if saveToFile:
         np.savetxt(filename, feat, delimiter=",")
     return indices
+
+def print_graph_for_instance(X, y, labels, instance, feat=NULL, neighbors=NULL, vis=NULL, show=False, saveToFile=False, filename="graph.pdf"){
+    if feat==NULL:
+        feat = X
+    if vis==NULL:
+        if X.ndim > 2:
+            print("This raw data cannot be visualized with tSNE")
+            return
+        vis = tsne(feat)
+    if nn==NULL:
+        nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(feat)
+        distances, neighbors = nbrs.kneighbors(feat)
+
+    if np.max(labels) > 4:
+        pal = color_pallette_big
+    else:
+        pal = color_pallette_small
+
+    if X.ndim == 2:
+        X = np.reshape((X.shape[0], 1, X.shape[1]))
+
+    rep_signal = X[np.where(y==sus_label)][0,:,:]
+
+    nn = neighbors[random_point, 1]
+    sus_label = y[instance]
+
+    ax1 = plt.subplot2grid((3,4), (0,0), colspan=3, rowspan=3)
+    ax2 = plt.subplot2grid((3,4), (0, 3))
+    ax3 = plt.subplot2grid((3,4), (1, 3))
+    ax4 = plt.subplot2grid((3,4), (2, 3))
+
+    for i in range(NUM_LABELS):
+        x = np.where(y==i)
+        ax1.scatter(vis[x, 0], vis[x, 1], s=6, c=pal[i], marker=".", label=labels[i])
+    ax1.scatter(vis[instance, 0], vis[instance, 1], s=200, c=pal[sus_label], marker="X", label=labels[sus_label])
+    ax1.set_title("tSNE of all features")
+    ax1.legend()
+    ax1.axis('off')
+
+    ax2.plot(range(0, len(X[instance, 0, :])), X[instance, 0, :], c=pal[sus_label])
+    ax2.plot(range(0, len(X[random_point, 1, :])), X[random_point, 1, :], c=pal[sus_label])
+    ax2.plot(range(0, len(X[random_point, 2, :])), X[random_point, 2, :], c=pal[sus_label])
+    ax2.set_title("Suspicious point with label: " + str(labels[sus_label]))
+}
 
 def preprocess_raw_data_and_labels(X, y):
     print("Applying pre-processing")

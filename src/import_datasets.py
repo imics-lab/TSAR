@@ -14,12 +14,27 @@ def get_unimib_data(s="acc"):
 
     y = np.array(y - 1)
     X = np.zeros((len(X_flat), 3, 151), dtype='float')
-    X[:,0,0:150]=X_flat[:,0:150]
-    X[:,1,0:150]=X_flat[:,151:301]
-    X[:,2,0:150]=X_flat[:,302:452]
+    X[:,0,0:151]=X_flat[:,0:151]
+    X[:,1,0:151]=X_flat[:,151:302]
+    X[:,2,0:151]=X_flat[:,302:453]
     print(labels)
+    return X, y, labels
+
+def get_uci_data():
+    print("Loading UCI HAR Dataset")
+    X_x = np.genfromtxt("data/UCI HAR Dataset/train/Inertial Signals/total_acc_x_train.txt" )
+    X_y = np.genfromtxt("data/UCI HAR Dataset/train/Inertial Signals/total_acc_x_train.txt" )
+    X_z = np.genfromtxt("data/UCI HAR Dataset/train/Inertial Signals/total_acc_x_train.txt" )
+    X = np.zeros((7352, 3, 128))
+    X[:,0,:]=X_x[:,:]
+    X[:,1,:]=X_y[:,:]
+    X[:,2,:]=X_z[:,:]
+    y = np.genfromtxt("data/UCI HAR Dataset/train/y_train.txt")
+    with open("data/UCI HAR Dataset/activity_labels.txt") as f:
+        labels = f.read().split('\n')
+    labels = labels[:-1]
     return X, y, labels
 
 if __name__ == "__main__":
     X, y, labels = get_unimib_data("two_classes")
-    
+    X, y, labels = get_uci_data()
