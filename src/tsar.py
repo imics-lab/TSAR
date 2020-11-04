@@ -4,6 +4,7 @@
 #Identify and review a portion of a dataset most likely to be mislabeled
 
 import numpy as np
+import random as rand
 from utils.build_AE import get_trained_AE
 from utils.build_sup_extractor import get_trained_sfe
 from utils.build_simple_dnn import get_trained_dnn
@@ -63,16 +64,31 @@ def get_NN_for_dataset(X, saveToFile=False, filename="nn.csv"):
         np.savetxt(filename, feat, delimiter=",")
     return indices
 
-def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, vis=None, show=False, saveToFile=False, filename="graph.pdf"):
+def preprocess_raw_data_and_labels(X, y):
+    print("Applying pre-processing")
+    if len(X) != len(y):
+        print("Data and labels must have same number of instances")
+        return
+    m = np.max(X)
+    X = (X/m)
+    if y.ndim == 1:
+        y = to_categorical(y)
 
-    if feat==None:
+    return X,y
+
+def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, vis=None, show=False, saveToFile=False, filename="graph.pdf", mislabeled=False):
+    #X, y = preprocess_raw_data_and_labels(X, y)
+    if y.ndim>=2:
+        #print("Converting labels from One-Hot")
+        y = np.argmax(y, axis=-1)
+    if feat is None:
         feat = X
-    if vis==None:
+    if vis is None:
         if X.ndim > 2:
             print("This raw data cannot be visualized with tSNE")
             return
         vis = tsne(n_components=2, n_jobs=8).fit_transform(feat)
-    if neighbors==None:
+    if neighbors is None:
         nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(feat)
         distances, neighbors = nbrs.kneighbors(feat)
 
@@ -84,37 +100,37 @@ def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, 
     if X.ndim == 2:
         X = np.reshape(X, (X.shape[0], 1, X.shape[1]))
 
-    print(vis)
-
     nn = neighbors[instance, 1]
-    sus_label = np.argmax(y[instance])
-    print(sus_label)
-    #rep_signal = X[np.where(y==sus_label)][0,:,:]
-    rep_signal = X[0, : , :]
+    sus_label = y[instance]
+    NUM_LABELS = int(np.max(y)+1)
+    if mislabeled:
+        sus_label = (sus_label + rand.randint(1,NUM_LABELS)) % NUM_LABELS
 
+    rep_signal = X[np.where(y==sus_label)][0,:,:]
+
+    figure = plt.figure(1, figsize=(15,10))
     ax1 = plt.subplot2grid((3,4), (0,0), colspan=3, rowspan=3)
     ax2 = plt.subplot2grid((3,4), (0, 3))
     ax3 = plt.subplot2grid((3,4), (1, 3))
     ax4 = plt.subplot2grid((3,4), (2, 3))
 
-    NUM_LABELS = int(np.max(y)+1)
-    NUM_SAMPLES = X.shape[2]
+    NUM_SAMPLES = len(X[0,0,:])
 
     for i in range(NUM_LABELS):
         x = np.where(y==i)
         ax1.scatter(vis[x, 0], vis[x, 1], s=6, c=pal[i], marker=".", label=labels[i])
-    ax1.scatter(vis[instance, 0], vis[instance, 1], s=200, c=pal[sus_label], marker="X", label=labels[sus_label])
+    ax1.scatter(vis[instance, 0], vis[instance, 1], s=200, c=pal[sus_label], marker="X", label="Suspicious Point")
     ax1.set_title("tSNE of all features")
     ax1.legend()
     ax1.axis('off')
 
     for i in range(X.shape[1]):
-        ax2.plot(range(0, NUM_SAMPLES), X[instance, 0, :], c=pal[sus_label])
+        ax2.plot(range(0, NUM_SAMPLES), X[instance, i, :], c=pal[sus_label])
     ax2.set_title("Suspicious point with label: " + str(labels[sus_label]))
 
     for i in range(X.shape[1]):
-        ax3.plot(range(0, NUM_SAMPLES), X[nn, i, :], c=pal[np.argmax(y[nn])])
-    ax3.set_title("Nearest neighbor has label: " + str(labels[np.argmax(y[nn])]))
+        ax3.plot(range(0, NUM_SAMPLES), X[nn, i, :], c=pal[y[nn]])
+    ax3.set_title("Nearest neighbor has label: " + str(labels[y[nn]]))
 
     for i in range(X.shape[1]):
         ax4.plot(range(0, NUM_SAMPLES), rep_signal[i,:], c=pal[sus_label])
@@ -127,18 +143,6 @@ def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, 
 
     if show:
         plt.show()
-
-def preprocess_raw_data_and_labels(X, y):
-    print("Applying pre-processing")
-    if len(X) != len(y):
-        print("Data and labels must have same number of instances")
-        return
-    m = np.max(X)
-    X = (X/m)
-    if y.ndim == 1:
-        y = to_categorical(y)
-
-    return X,y
 
 def count_class_imbalance(y):
     if y.ndim == 1:
