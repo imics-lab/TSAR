@@ -145,14 +145,20 @@ def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, 
         plt.show()
 
 def add_noise_to_labels(y, percentNoise=5, saveToFile=False, filename="noisy_labels.csv"):
-    bad = np.array()
+    bad = np.array([], dtype='int')
     NUM_LABELS = int(np.max(y)+1)
+    #print(len(y), " labels are getting noisy")
+    #print ("starting off with these bad indices: ", bad)
     if y.ndim>=2:
         y = np.argmax(y, axis=-1)
     for i in range(len(y)):
-        if rand.randint < percentNoise:
-            y[i] = (y[il + rand.randint(1,NUM_LABELS)) % NUM_LABELS
-            bad = numpy.append(y, i)
+        chance = rand.randint(0, 100)
+        if chance < percentNoise:
+            #print(i, " is getting a new label because ", chance, " is less than ", percentNoise)
+            y[i] = (y[i] + rand.randint(1,NUM_LABELS)) % NUM_LABELS
+            bad = np.append(bad, i)
+    #print(bad)
+    print(len(bad), " bad idices added")
     return y, bad
 
 def count_class_imbalance(y):

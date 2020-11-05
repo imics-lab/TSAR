@@ -23,8 +23,8 @@ def get_unimib_data(s="acc"):
 def get_uci_data():
     print("Loading UCI HAR Dataset")
     X_x = np.genfromtxt("data/UCI HAR Dataset/train/Inertial Signals/total_acc_x_train.txt" )
-    X_y = np.genfromtxt("data/UCI HAR Dataset/train/Inertial Signals/total_acc_x_train.txt" )
-    X_z = np.genfromtxt("data/UCI HAR Dataset/train/Inertial Signals/total_acc_x_train.txt" )
+    X_y = np.genfromtxt("data/UCI HAR Dataset/train/Inertial Signals/total_acc_y_train.txt" )
+    X_z = np.genfromtxt("data/UCI HAR Dataset/train/Inertial Signals/total_acc_z_train.txt" )
     X = np.zeros((7352, 3, 128))
     X[:,0,:]=X_x[:,:]
     X[:,1,:]=X_y[:,:]
