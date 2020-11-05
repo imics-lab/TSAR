@@ -119,22 +119,22 @@ def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, 
     for i in range(NUM_LABELS):
         x = np.where(y==i)
         ax1.scatter(vis[x, 0], vis[x, 1], s=6, c=pal[i], marker=".", label=labels[i])
-    ax1.scatter(vis[instance, 0], vis[instance, 1], s=200, c=pal[sus_label], marker="X", label="Suspicious Point")
-    ax1.set_title("tSNE of all features")
-    ax1.legend()
+    ax1.scatter(vis[instance, 0], vis[instance, 1], s=250, c=pal[sus_label], marker="X", label="Suspicious Point")
+    ax1.set_title("tSNE of all features", fontsize=36)
+    ax1.legend(prop={'size': 18})
     ax1.axis('off')
 
     for i in range(X.shape[1]):
         ax2.plot(range(0, NUM_SAMPLES), X[instance, i, :], c=pal[sus_label])
-    ax2.set_title("Suspicious point with label: " + str(labels[sus_label]))
+    ax2.set_title("Suspicious point with label: " + str(labels[sus_label]), fontsize=18)
 
     for i in range(X.shape[1]):
         ax3.plot(range(0, NUM_SAMPLES), X[nn, i, :], c=pal[y[nn]])
-    ax3.set_title("Nearest neighbor has label: " + str(labels[y[nn]]))
+    ax3.set_title("Nearest neighbor has label: " + str(labels[y[nn]]), fontsize=18)
 
     for i in range(X.shape[1]):
         ax4.plot(range(0, NUM_SAMPLES), rep_signal[i,:], c=pal[sus_label])
-    ax4.set_title("Another point with label: " + str(labels[sus_label]))
+    ax4.set_title("Another point with label: " + str(labels[sus_label]), fontsize=18)
 
     plt.tight_layout()
 
@@ -154,8 +154,9 @@ def add_noise_to_labels(y, percentNoise=5, saveToFile=False, filename="noisy_lab
     for i in range(len(y)):
         chance = rand.randint(0, 100)
         if chance < percentNoise:
-            #print(i, " is getting a new label because ", chance, " is less than ", percentNoise)
+            print("Old label: ", y[i])
             y[i] = (y[i] + rand.randint(1,NUM_LABELS)) % NUM_LABELS
+            print("New label: ", y[i])
             bad = np.append(bad, i)
     #print(bad)
     print(len(bad), " bad idices added")
