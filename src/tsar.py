@@ -117,6 +117,8 @@ def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, 
     NUM_SAMPLES = len(X[0,0,:])
 
     for i in range(NUM_LABELS):
+        if (not i==sus_label) and (not i==y[nn]):
+            continue
         x = np.where(y==i)
         ax1.scatter(vis[x, 0], vis[x, 1], s=6, c=pal[i], marker=".", label=labels[i])
     ax1.scatter(vis[instance, 0], vis[instance, 1], s=250, c=pal[sus_label], marker="X", label="Suspicious Point")
@@ -144,6 +146,95 @@ def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, 
     if show:
         plt.show()
 
+def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=None, show=False, saveToFile=False, filename="graph.pdf", mislabeled=False):
+    if y.ndim>=2:
+        #print("Converting labels from One-Hot")
+        y = np.argmax(y, axis=-1)
+    NUM_LABELS = len(y)
+
+    if feat is None:
+        feat = X
+
+    same_label = y[instance]
+    if mislabeled:
+        same_label = (y[instance] + rand.randint(1,NUM_LABELS)) % NUM_LABELS
+    else:
+        same_label = y[instance]
+
+    feat_same = feat[np.where(y==same_label)]
+    feat_diff = feat[np.where(y!=same_label)]
+    feat_diff = np.append(feat_diff, [feat[instance]], axis=0)
+
+    #print(feat_same)
+    #print(feat_diff)
+
+    if np.max(y) > 4:
+        pal = color_pallette_big
+    else:
+        pal = color_pallette_small
+
+    if X.ndim == 2:
+        X = np.reshape(X, (X.shape[0], 1, X.shape[1]))
+
+    NUM_SAMPLES = X.shape[2]
+
+    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(feat_same)
+    distances, nn_same = nbrs.kneighbors(feat_same)
+    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(feat_diff)
+    distances, nn_diff = nbrs.kneighbors(feat_diff)
+
+    u, c = np.unique(y[:instance], return_counts=True)
+    same_instance = c[same_label]
+    #diff_instance = np.sum(c) - same_label
+    diff_label = y[nn_diff[-1,1]+same_instance]
+
+    print("Same label: ", same_label)
+    print("Diff label: ", diff_label)
+
+    if vis is None:
+        if feat.ndim > 2:
+            print("This raw data cannot be visualized with tSNE")
+            return
+        vis = tsne(n_components=2, n_jobs=8).fit_transform(feat)
+
+    figure = plt.figure(1, figsize=(15,10))
+    ax1 = plt.subplot2grid((3,4), (0,0), colspan=3, rowspan=3)
+    ax2 = plt.subplot2grid((3,4), (0, 3))
+    ax3 = plt.subplot2grid((3,4), (1, 3))
+    ax4 = plt.subplot2grid((3,4), (2, 3))
+
+    for i in range(NUM_LABELS):
+        if (not i==same_label) and (not i==diff_label):
+            continue
+        x = np.where(y==i)
+        ax1.scatter(vis[x, 0], vis[x, 1], s=10, c=pal[i], marker=".", label=labels[i])
+    ax1.scatter(vis[instance, 0], vis[instance, 1], s=250, c=pal[same_label], marker="X", label="Suspicious Point")
+    ax1.set_title("tSNE of all features", fontsize=36)
+    ax1.legend(prop={'size': 18})
+    ax1.axis('off')
+
+    for i in range(X.shape[1]):
+        ax2.plot(range(0, NUM_SAMPLES), X[instance, i, :], c=pal[same_label])
+    ax2.set_title("Suspicious point with label: " + str(labels[same_label]), fontsize=18)
+
+    for i in range(X.shape[1]):
+        ax3.plot(range(0, NUM_SAMPLES), X[nn_same[same_instance, 1], i, :], c=pal[same_label])
+    ax3.set_title("Nearest neighbor with label: " + str(labels[same_label]), fontsize=18)
+
+    for i in range(X.shape[1]):
+        ax4.plot(range(0, NUM_SAMPLES), X[nn_diff[-1, 1], i, :], c=pal[diff_label])
+    ax4.set_title("Nearest neighbor with label: " + str(labels[diff_label]), fontsize=18)
+
+    plt.tight_layout()
+
+    if saveToFile:
+        plt.savefig(filename)
+
+    if show:
+        plt.show()
+
+    return
+
 def add_noise_to_labels(y, percentNoise=5, saveToFile=False, filename="noisy_labels.csv"):
     bad = np.array([], dtype='int')
     NUM_LABELS = int(np.max(y)+1)
@@ -154,9 +245,7 @@ def add_noise_to_labels(y, percentNoise=5, saveToFile=False, filename="noisy_lab
     for i in range(len(y)):
         chance = rand.randint(0, 100)
         if chance < percentNoise:
-            print("Old label: ", y[i])
             y[i] = (y[i] + rand.randint(1,NUM_LABELS)) % NUM_LABELS
-            print("New label: ", y[i])
             bad = np.append(bad, i)
     #print(bad)
     print(len(bad), " bad idices added")
@@ -216,4 +305,4 @@ if __name__ == "__main__":
     print("worst index: ", indices[0])
     labels = ['type one', 'type two', 'type three']
     print("Plotting index 0:")
-    print_graph_for_instance(X, y, labels, instance=indices[0], show=True)
+    print_graph_for_instance_two_class(X, y, labels, instance=0, show=True)
