@@ -155,7 +155,6 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     if feat is None:
         feat = X
 
-    same_label = y[instance]
     if mislabeled:
         same_label = (y[instance] + rand.randint(1,NUM_LABELS)) % NUM_LABELS
     else:
@@ -164,6 +163,14 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     feat_same = feat[np.where(y==same_label)]
     feat_diff = feat[np.where(y!=same_label)]
     feat_diff = np.append(feat_diff, [feat[instance]], axis=0)
+
+    #y_same = y[np.where(y==same_label)]
+    y_diff = y[np.where(y!=same_label)]
+    y_diff = np.append(y_diff, [y[instance]], axis=0)
+
+    X_same = X[np.where(y==same_label)]
+    X_diff = X[np.where(y!=same_label)]
+    X_diff = np.append(X_diff, [X[instance]], axis=0)
 
     if(len(feat_same)==0):
         print("Length zero same feature set encountered")
@@ -175,10 +182,8 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     #print(feat_same)
     #print(feat_diff)
 
-    if np.max(y) > 4:
-        pal = color_pallette_big
-    else:
-        pal = color_pallette_small
+
+    pal = color_pallette_small
 
     if X.ndim == 2:
         X = np.reshape(X, (X.shape[0], 1, X.shape[1]))
@@ -192,8 +197,8 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
 
     u, c = np.unique(y[:instance], return_counts=True)
     same_instance = c[same_label]+1
-    diff_instance = c[diff_label]
-    diff_label = y[nn_diff[-1,1]]
+    # diff_instance = c[diff_label]
+    diff_label = y_diff[nn_diff[-1,1]]
 
     print("Same label: ", same_label)
     print("Diff label: ", diff_label)
@@ -210,26 +215,26 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     ax3 = plt.subplot2grid((3,4), (1, 3))
     ax4 = plt.subplot2grid((3,4), (2, 3))
 
-    for i in range(NUM_LABELS):
-        if (not i==same_label) and (not i==diff_label):
-            continue
-        x = np.where(y==i)
-        ax1.scatter(vis[x, 0], vis[x, 1], s=10, c=pal[i], marker=".", label=labels[i])
-    ax1.scatter(vis[instance, 0], vis[instance, 1], s=250, c=pal[same_label], marker="X", label="Suspicious Point")
+
+    x = np.where(y==same_label)
+    ax1.scatter(vis[x, 0], vis[x, 1], s=10, c=pal[0], marker=".", label=labels[i])
+    x = np.where(y==diff_label)
+    ax1.scatter(vis[x, 0], vis[x, 1], s=10, c=pal[1], marker=".", label=labels[i])
+    ax1.scatter(vis[instance, 0], vis[instance, 1], s=250, c=pal[0], marker="X", label="Suspicious Point")
     ax1.set_title("tSNE of all features", fontsize=36)
     ax1.legend(prop={'size': 18})
     ax1.axis('off')
 
     for i in range(X.shape[1]):
-        ax2.plot(range(0, NUM_SAMPLES), X[instance, i, :], c=pal[same_label])
-    ax2.set_title("Suspicious point with label: " + str(labels[same_label]), fontsize=18)
+        ax2.plot(range(0, NUM_SAMPLES), X[instance, i, :], c=pal[0])
+    ax2.set_title("Suspicious point has label: " + str(labels[same_label]), fontsize=18)
 
     for i in range(X.shape[1]):
-        ax3.plot(range(0, NUM_SAMPLES), X[nn_same[same_instance, 1], i, :], c=pal[same_label])
+        ax3.plot(range(0, NUM_SAMPLES), X_same[nn_same[same_instance, 1], i, :], c=pal[0])
     ax3.set_title("Nearest neighbor with label: " + str(labels[same_label]), fontsize=18)
 
     for i in range(X.shape[1]):
-        ax4.plot(range(0, NUM_SAMPLES), X[nn_diff[-1, 1], i, :], c=pal[diff_label])
+        ax4.plot(range(0, NUM_SAMPLES), X_diff[nn_diff[-1, 1], i, :], c=pal[1])
     ax4.set_title("Nearest neighbor with label: " + str(labels[diff_label]), fontsize=18)
 
     plt.tight_layout()
