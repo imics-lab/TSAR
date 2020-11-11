@@ -150,7 +150,7 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     if y.ndim>=2:
         #print("Converting labels from One-Hot")
         y = np.argmax(y, axis=-1)
-    NUM_LABELS = len(y)
+    NUM_LABELS = int(np.max(y)+1)
 
     if feat is None:
         feat = X
@@ -164,6 +164,13 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     feat_same = feat[np.where(y==same_label)]
     feat_diff = feat[np.where(y!=same_label)]
     feat_diff = np.append(feat_diff, [feat[instance]], axis=0)
+
+    if(len(feat_same)==0):
+        print("Length zero same feature set encountered")
+        return
+    elif(len(feat_diff)==0):
+        print("Length zero diff feature set encountered")
+        return
 
     #print(feat_same)
     #print(feat_diff)
@@ -184,9 +191,9 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     distances, nn_diff = nbrs.kneighbors(feat_diff)
 
     u, c = np.unique(y[:instance], return_counts=True)
-    same_instance = c[same_label]
-    #diff_instance = np.sum(c) - same_label
-    diff_label = y[nn_diff[-1,1]+same_instance]
+    same_instance = c[same_label]+1
+    diff_instance = c[diff_label]
+    diff_label = y[nn_diff[-1,1]]
 
     print("Same label: ", same_label)
     print("Diff label: ", diff_label)
