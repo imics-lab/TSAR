@@ -14,6 +14,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 import ipywidgets as widgets
 from IPython.display import display
 from matplotlib import pyplot as plt
+import matplotlib.patches as mpatches
 from sklearn.neighbors import NearestNeighbors
 from sklearn.manifold import TSNE as tsne
 
@@ -195,8 +196,8 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(feat_diff)
     distances, nn_diff = nbrs.kneighbors(feat_diff)
 
-    u, c = np.unique(y[:instance], return_counts=True)
-    same_instance = c[same_label]+1
+    #u, c = np.unique(y[:instance], return_counts=True)
+    same_instance = len(np.where(y[:instance]==same_label))
     # diff_instance = c[diff_label]
     diff_label = y_diff[nn_diff[-1,1]]
 
@@ -217,12 +218,14 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
 
 
     x = np.where(y==same_label)
-    ax1.scatter(vis[x, 0], vis[x, 1], s=10, c=pal[0], marker=".", label=labels[i])
+    ax1.scatter(vis[x, 0], vis[x, 1], s=6, c=pal[0], marker="^")
     x = np.where(y==diff_label)
-    ax1.scatter(vis[x, 0], vis[x, 1], s=10, c=pal[1], marker=".", label=labels[i])
+    ax1.scatter(vis[x, 0], vis[x, 1], s=6, c=pal[1], marker="s")
     ax1.scatter(vis[instance, 0], vis[instance, 1], s=250, c=pal[0], marker="X", label="Suspicious Point")
     ax1.set_title("tSNE of all features", fontsize=36)
-    ax1.legend(prop={'size': 18})
+    patch_1 = mpatches.Patch(color=pal[0], label=labels[same_label])
+    patch_2 = mpatches.Patch(color=pal[1], label=labels[diff_label])
+    ax1.legend(prop={'size': 18}, handles=[patch_1, patch_2])
     ax1.axis('off')
 
     for i in range(X.shape[1]):
