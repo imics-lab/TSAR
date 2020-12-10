@@ -46,7 +46,10 @@ if __name__ == "__main__":
         else:
             features = get_supervised_features(X, y, True, "data/"+set_name+"_sup_feat.csv")
     elif extractor == 'U':
-        features = get_unsupervised_features(X)
+        if os.path.isfile("data/"+set_name+"_unsup_feat.csv"):
+            features = np.genfromtxt("data/"+set_name+"_unsup_feat.csv", delimiter=',')
+        else:
+            features = get_supervised_features(X, y, True, "data/"+set_name+"_unsup_feat.csv")
     else:
         print("Feature extractor must be S or U")
         exit()

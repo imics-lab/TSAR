@@ -31,7 +31,7 @@ def build_AE(train_example, features_per_channel=30):
         Reshape((s[0], s[1])),
         Conv1D(filters=128, kernel_size=16, activation='relu', padding='same'),
         Conv1D(filters=128, kernel_size=16, activation='relu', padding='same'),
-        MaxPooling1D(pool_size=(128), data_format='channels_first'),
+        MaxPooling1D(pool_size=(16), data_format='channels_first'),
         Flatten(),
         Dense(features_per_channel*s[0], activation='softmax', name='Embedding'),
         Reshape((features_per_channel,s[0])),
@@ -56,7 +56,7 @@ def trim_decoder(autoenc):
     print("Removing decoder from autoencoder....")
     o = autoenc.layers[-8].output
     encoder = Model(autoenc.input, [o])
-    #encoder.summary()
+    encoder.summary()
     return encoder
 
 def get_trained_AE(X, withVisual=False):
