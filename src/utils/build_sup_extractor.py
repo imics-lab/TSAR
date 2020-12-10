@@ -73,9 +73,12 @@ def train_sfe(sfe, X, y, withEvaluation=False):
     return sfe
 
 def get_trained_sfe(X, y):
+    if y.ndim == 1:
+        y = to_categorical(y)
     numLabels = y.shape[1]
     sfe = build_sfe(X[0], num_labels=numLabels)
     sfe = train_sfe(sfe, X, y)
+    sfe = trim_classifier(sfe)
     return sfe
 
 if __name__ == "__main__":
