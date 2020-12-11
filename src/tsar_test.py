@@ -8,6 +8,7 @@ import os.path
 import numpy as np
 from tsar import get_supervised_features, get_unsupervised_features, check_dataset, print_graph_for_instance_two_class
 from import_datasets import get_unimib_data, get_uci_data
+from sklearn.manifold import TSNE as tsne
 
 if __name__ == "__main__":
     noise_percent = 0.05
@@ -68,8 +69,8 @@ if __name__ == "__main__":
     print("Generating graphs for {} worst instances".format(number_of_bad_guys))
 
     bad_guys = indices[:number_of_bad_guys]
-    #bad_guys_X = X[bad_guys]
-    #bad_guys_y = y[bad_guys]
-    #bad_guys_feat = features[bad_guys]
+    vis = tsne(n_components=2, n_jobs=8).fit_transform(features)
 
-    print_graph_for_instance_two_class(X, y, labels, bad_guys[0], feat=features, vis=None, show=True)
+    for b in bad_guys:
+        file_name = "imgs/review/{}_{}_instance_{}.pdf".format(set_name, extractor, b)
+        print_graph_for_instance_two_class(X, y, labels, b, feat=features, vis=vis, show=False, saveToFile=True, filename=file_name)
