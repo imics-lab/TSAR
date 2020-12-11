@@ -6,7 +6,7 @@
 import sys
 import os.path
 import numpy as np
-from tsar import get_supervised_features, get_unsupervised_features
+from tsar import get_supervised_features, get_unsupervised_features, check_dataset, print_graph_for_instance_two_class
 from import_datasets import get_unimib_data, get_uci_data
 
 if __name__ == "__main__":
@@ -32,6 +32,7 @@ if __name__ == "__main__":
 
     if set_name == "UniMiB":
         X, y, labels = get_unimib_data("adl")
+        print("Unimib: ", len(X))
     elif set_name == "UCI":
         X, y, Labels = get_uci_data()
     else:
@@ -49,7 +50,7 @@ if __name__ == "__main__":
         if os.path.isfile("data/"+set_name+"_unsup_feat.csv"):
             features = np.genfromtxt("data/"+set_name+"_unsup_feat.csv", delimiter=',')
         else:
-            features = get_supervised_features(X, y, True, "data/"+set_name+"_unsup_feat.csv")
+            features = get_unsupervised_features(X, True, "data/"+set_name+"_unsup_feat.csv")
     else:
         print("Feature extractor must be S or U")
         exit()
@@ -59,3 +60,16 @@ if __name__ == "__main__":
         print("################ Supervised ################\n")
     else:
         print("################ Unsupervised ################\n")
+
+    print("{} instances in full dataset.".format(len(X)))
+
+    indices = check_dataset(X, y, featureType='p', features=features)
+    number_of_bad_guys = int(noise_percent*X.shape[0])
+    print("Generating graphs for {} worst instances".format(number_of_bad_guys))
+
+    bad_guys = indices[:number_of_bad_guys]
+    #bad_guys_X = X[bad_guys]
+    #bad_guys_y = y[bad_guys]
+    #bad_guys_feat = features[bad_guys]
+
+    print_graph_for_instance_two_class(X, y, labels, bad_guys[0], feat=features, vis=None, show=True)

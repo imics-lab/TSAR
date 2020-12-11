@@ -17,6 +17,7 @@ from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 from sklearn.neighbors import NearestNeighbors
 from sklearn.manifold import TSNE as tsne
+from sklearn.utils import shuffle
 
 
 #Source from Labelfix repository
@@ -45,7 +46,7 @@ def sort_indices(pred_y, true_y):
     return indices
 
 def get_unsupervised_features(X, saveToFile=False, filename="unsup_features.csv"):
-    ae = get_trained_AE(X)
+    ae = get_trained_AE(X, withVisual=False)
     feat = ae.predict(X)
     if saveToFile:
         np.savetxt(filename, feat, delimiter=",")
@@ -74,6 +75,8 @@ def preprocess_raw_data_and_labels(X, y):
     X = (X/m)
     if y.ndim == 1:
         y = to_categorical(y)
+
+    X,y = shuffle(X,y)
 
     return X,y
 
@@ -277,7 +280,7 @@ def count_class_imbalance(y):
         counts[i] = np.sum(y[:,i])
     return np.max(counts)/np.min(counts)
 
-def check_dataset(X, y, featureType='u'):
+def check_dataset(X, y, featureType='u', features=None):
     print("Checking dataset for suspicious labels")
     if featureType=='u':
         model = get_trained_AE(X)
@@ -289,13 +292,15 @@ def check_dataset(X, y, featureType='u'):
         feats, y = preprocess_raw_data_and_labels(X,y)
     elif featureType=='o':
         feats, y = preprocess_raw_data_and_labels(X,y)
+    elif featureType=='p':
+        feats, y = preprocess_raw_data_and_labels(features,y)
     else:
-        print("featureType must be u, s, or o")
+        print("featureType must be u, s, p, or o")
         return
 
     c = get_trained_dnn(feats, y)
-    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=5)
-    c.fit(X, y, epochs=50, verbose=1, callbacks=[es], validation_split=0.1, batch_size=10)
+    #es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=5)
+    #c.fit(feats, y, epochs=50, verbose=1, callbacks=[es], validation_split=0.1, batch_size=10)
 
     y_pred = c.predict(feats)
 

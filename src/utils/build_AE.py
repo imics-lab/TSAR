@@ -75,7 +75,7 @@ def get_trained_AE(X, withVisual=False):
 if __name__ == "__main__":
     print("Test model building")
     #rand_input = np.random.ranf((100, 300, 3))
-    rand_input = np.genfromtxt('data/synthetic_set1_data.csv', delimiter=',')
+    rand_input = np.genfromtxt('data/synthetic_test_data.csv', delimiter=',')
     #norm = np.linalg.norm(rand_input[0])
     norm = np.max(rand_input)
     print("norm= ", norm)

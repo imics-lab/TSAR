@@ -50,7 +50,7 @@ def trim_classifier(sfe):
     print("Removing classification layers")
     o = sfe.layers[-4].output
     extractor = Model(sfe.input, [o])
-    extractor.summary()
+    #extractor.summary()
     return extractor
 
 def train_sfe(sfe, X, y, withEvaluation=False):
