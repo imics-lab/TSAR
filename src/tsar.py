@@ -61,7 +61,7 @@ def get_supervised_features(X, y, saveToFile=False, filename="sup_features.csv")
     return feat
 
 def get_NN_for_dataset(X, saveToFile=False, filename="nn.csv"):
-    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(X)
+    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree', metric=cos_dis).fit(X)
     distances, indices = nbrs.kneighbors(X)
     if saveToFile:
         np.savetxt(filename, feat, delimiter=",")
