@@ -27,19 +27,19 @@ if __name__ == "__main__":
     p.line(X, y, legend_label="y=sin(x)")
 
     button = Button(label="Button", button_type="success")
-    #button.js_on_click(CustomJS(code="console.log('button: click!', this.toString())"))
+    button.js_on_click(CustomJS(code="console.log('button: click!', this.toString())"))
     #button.js_on_click(CustomJS(code=callback))
-    button.js_on_click(CustomJS(code="""
-        var data = source.data;
-        value1=data['x'];
-        var out = "";
-        var file = new Blob([out], {type: 'text/plain'});
-        var elem = window.document.createElement('a');
-        elem.href = window.URL.createObjectURL(file);
-        elem.download = 'button_clicks.txt';
-        document.body.appendChild(elem);
-        elem.click();
-        document.body.removeChild(elem);
-        """))
+    # button.js_on_click(CustomJS(code="""
+    #     var data = source.data;
+    #     value1=data['x'];
+    #     var out = "";
+    #     var file = new Blob([out], {type: 'text/plain'});
+    #     var elem = window.document.createElement('a');
+    #     elem.href = window.URL.createObjectURL(file);
+    #     elem.download = 'button_clicks.txt';
+    #     document.body.appendChild(elem);
+    #     elem.click();
+    #     document.body.removeChild(elem);
+    #     """))
 
     show(column(p,button))

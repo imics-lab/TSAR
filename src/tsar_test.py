@@ -32,7 +32,7 @@ if __name__ == "__main__":
         exit()
 
     if set_name == "UniMiB":
-        X, y, labels = get_unimib_data("adl")
+        X, y, labels = get_unimib_data("two_classes")
         print("Unimib: ", len(X))
     elif set_name == "UCI":
         X, y, Labels = get_uci_data()

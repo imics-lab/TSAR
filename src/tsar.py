@@ -18,6 +18,7 @@ import matplotlib.patches as mpatches
 from sklearn.neighbors import NearestNeighbors
 from sklearn.manifold import TSNE as tsne
 from sklearn.utils import shuffle
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 #Source from Labelfix repository
@@ -79,6 +80,12 @@ def preprocess_raw_data_and_labels(X, y):
     X,y = shuffle(X,y)
 
     return X,y
+
+def cos_dis(x,y):
+    X = [x]
+    Y = [y]
+    d = cosine_similarity(X, Y)
+    return 1 - d
 
 def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, vis=None, show=False, saveToFile=False, filename="graph.pdf", mislabeled=False):
     #X, y = preprocess_raw_data_and_labels(X, y)
@@ -194,9 +201,9 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
 
     NUM_SAMPLES = X.shape[2]
 
-    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(feat_same)
+    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree', metric=cos_dis).fit(feat_same)
     distances, nn_same = nbrs.kneighbors(feat_same)
-    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(feat_diff)
+    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree', metric=cos_dis).fit(feat_diff)
     distances, nn_diff = nbrs.kneighbors(feat_diff)
 
     #u, c = np.unique(y[:instance], return_counts=True)
@@ -204,8 +211,8 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     # diff_instance = c[diff_label]
     diff_label = y_diff[nn_diff[-1,1]]
 
-    print("Same label: ", same_label)
-    print("Diff label: ", diff_label)
+    #print("Same label: ", same_label)
+    #print("Diff label: ", diff_label)
 
     if vis is None:
         if feat.ndim > 2:
@@ -219,18 +226,35 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     ax3 = plt.subplot2grid((3,4), (1, 3))
     ax4 = plt.subplot2grid((3,4), (2, 3))
 
-
-    x = np.where(y==same_label)
-    ax1.scatter(vis[x, 0], vis[x, 1], s=6, c=pal[0], marker="^")
-    x = np.where(y==diff_label)
-    ax1.scatter(vis[x, 0], vis[x, 1], s=10, c=pal[1], marker=".")
-    ax1.scatter(vis[instance, 0], vis[instance, 1], s=300, c='black', marker="X")
-    ax1.scatter(vis[instance, 0], vis[instance, 1], s=200, c=pal[0], marker="X", label="Suspicious Point")
-    ax1.set_title("tSNE of all features", fontsize=36)
-    patch_1 = mpatches.Patch(color=pal[0], label=labels[same_label])
-    patch_2 = mpatches.Patch(color=pal[1], label=labels[diff_label])
-    ax1.legend(prop={'size': 18}, handles=[patch_1, patch_2])
-    ax1.axis('off')
+    if(len(vis[0])==2):
+        print("2d tSNE")
+        x = np.where(y==same_label)
+        ax1.scatter(vis[x, 0], vis[x, 1], s=6, c=pal[0], marker="^")
+        x = np.where(y==diff_label)
+        ax1.scatter(vis[x, 0], vis[x, 1], s=10, c=pal[1], marker=".")
+        ax1.scatter(vis[instance, 0], vis[instance, 1], s=300, c='black', marker="X")
+        ax1.scatter(vis[instance, 0], vis[instance, 1], s=200, c=pal[0], marker="X", label="Suspicious Point")
+        ax1.set_title("tSNE of all features", fontsize=36)
+        patch_1 = mpatches.Patch(color=pal[0], label=labels[same_label])
+        patch_2 = mpatches.Patch(color=pal[1], label=labels[diff_label])
+        ax1.legend(prop={'size': 18}, handles=[patch_1, patch_2])
+        ax1.axis('off')
+    elif(len(vis[0])==3):
+        print("3d tSNE")
+        x = np.where(y==same_label)
+        ax1.scatter(vis[x, 0], vis[x, 1], vis[x, 2], c=pal[0], marker="^")
+        x = np.where(y==diff_label)
+        ax1.scatter(vis[x, 0], vis[x, 1], vis[x, 2], c=pal[1], marker=".")
+        ax1.scatter(vis[instance, 0], vis[instance, 1], vis[instance, 2], c='black', marker="X")
+        ax1.scatter(vis[instance, 0], vis[instance, 1], vis[instance, 2], c=pal[0], marker="X", label="Suspicious Point")
+        ax1.set_title("tSNE of all features", fontsize=36)
+        patch_1 = mpatches.Patch(color=pal[0], label=labels[same_label])
+        patch_2 = mpatches.Patch(color=pal[1], label=labels[diff_label])
+        ax1.legend(prop={'size': 18}, handles=[patch_1, patch_2])
+        ax1.axis('off')
+    else:
+        print("tSNE points have an unusual number of dimensions")
+        return
 
     for i in range(X.shape[1]):
         ax2.plot(range(0, NUM_SAMPLES), X[instance, i, :], c=pal[0])
