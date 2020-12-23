@@ -7,10 +7,10 @@ import numpy as np
 from utils.gen_ts_data import generate_pattern_array_as_csv, generate_pattern_array_as_csv_with_indexes
 
 if __name__ == "__main__":
-    generate_pattern_array_as_csv_with_indexes(length=500, numSamples=1000, numClasses=2, percentError=3, filename='data/synthetic/synthetic_set1')
-    generate_pattern_array_as_csv_with_indexes(length=500, numSamples=1000, numClasses=5, percentError=3, filename='data/synthetic/synthetic_set2')
-    generate_pattern_array_as_csv_with_indexes(length=1000, numSamples=5000, numClasses=2, percentError=3, filename='data/synthetic/synthetic_set3')
-    generate_pattern_array_as_csv_with_indexes(length=1000, numSamples=5000, numClasses=5, percentError=3, filename='data/synthetic/synthetic_set4')
+    generate_pattern_array_as_csv_with_indexes(length=150, numSamples=2000, numClasses=4, percentError=3, filename='data/synthetic/synthetic_set1')
+    generate_pattern_array_as_csv_with_indexes(length=150, numSamples=2000, numClasses=10, percentError=3, filename='data/synthetic/synthetic_set2')
+    generate_pattern_array_as_csv_with_indexes(length=300, numSamples=10000, numClasses=4, percentError=3, filename='data/synthetic/synthetic_set3')
+    generate_pattern_array_as_csv_with_indexes(length=300, numSamples=10000, numClasses=10, percentError=3, filename='data/synthetic/synthetic_set4')
 
     f = open("data_cleaning_experiments_results.txt", 'a')
     f.write("Creating 4 datasets with 3% label error\n")

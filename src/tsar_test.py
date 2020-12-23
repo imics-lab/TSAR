@@ -6,7 +6,7 @@
 import sys
 import os.path
 import numpy as np
-from tsar import get_supervised_features, get_unsupervised_features, check_dataset, print_graph_for_instance_two_class
+from tsar import get_supervised_features, get_unsupervised_features, check_dataset, print_graph_for_instance_two_class, preprocess_raw_data_and_labels
 from import_datasets import get_unimib_data, get_uci_data, get_synthetic_set
 from sklearn.manifold import TSNE as tsne
 
@@ -57,6 +57,8 @@ if __name__ == "__main__":
     else:
         print("Feature extractor must be S or U")
         exit()
+
+    #preprocess_raw_data_and_labels(X, y)
 
     print("\n################ Reviewing {0}% of {1} ################".format(noise_percent*100, set_name))
     if extractor == 'S':

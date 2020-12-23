@@ -44,7 +44,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 def sort_indices(pred_y, true_y):
     print("pred_y: ", pred_y)
     print("true_y:", true_y)
-    closeness = [1 - np.dot(pred_y[i], true_y[i]) for i in range(pred_y.shape[0])]
+    closeness = [np.dot(pred_y[i], true_y[i]) for i in range(pred_y.shape[0])]
     indices = np.argsort(closeness)
     print("closeness: ", closeness)
     print("indices: ", indices)
@@ -234,7 +234,7 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     ax4 = plt.subplot2grid((3,4), (2, 3))
 
     if(len(vis[0])==2):
-        print("2d tSNE")
+        #print("2d tSNE")
         x = np.where(y==same_label)
         ax1.scatter(vis[x, 0], vis[x, 1], s=6, c=pal[0], marker="^")
         x = np.where(y==diff_label)
@@ -247,7 +247,7 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
         ax1.legend(prop={'size': 18}, handles=[patch_1, patch_2])
         ax1.axis('off')
     elif(len(vis[0])==3):
-        print("3d tSNE")
+        #print("3d tSNE")
         x = np.where(y==same_label)
         ax1.scatter(vis[x, 0], vis[x, 1], vis[x, 2], c=pal[0], marker="^")
         x = np.where(y==diff_label)
