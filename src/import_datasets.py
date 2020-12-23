@@ -37,9 +37,14 @@ def get_uci_data():
     return X, y, labels
 
 def get_synthetic_set(num):
-    filename = "data/synthetic/synthetic_set" + str(num)
-    X = np.genfromtxt(filename+"_data.csv")
+    filename = "data/synthetic/synthetic_set{}".format(num)
+    #print(filename)
+    X = np.genfromtxt(filename + "_data.csv", dtype="float64", delimiter=",")
+    #print(X)
+    X = np.reshape(X, (len(X), 1, len(X[0])))
     y = np.genfromtxt(filename+"_labels.csv")
+    y = np.array(y, dtype="int")
+    #print(y)
     labels = []
     for i in range(len(y)):
         labels.append("Class {}".format(i))

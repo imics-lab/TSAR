@@ -35,7 +35,7 @@ if __name__ == "__main__":
         X, y, labels = get_unimib_data("adl")
         print("Unimib: ", len(X))
     elif set_name == "UCI":
-        X, y, Labels = get_uci_data()
+        X, y, labels = get_uci_data()
     elif set_name == "synthetic":
         X, y, labels = get_synthetic_set(1)
     else:
@@ -80,8 +80,9 @@ if __name__ == "__main__":
     a = 0
     identified_bad_indexes = np.array([])
     while a != -1:
-        a = input("Enter a bad index or -1 to stop: ")
+        a = int(input("Enter a bad index or -1 to stop: "))
         if a != -1:
-            identified_bad_indexes = np.append
+            identified_bad_indexes = np.append(identified_bad_indexes, a)
 
-    np.savetxt("test/identified_bad.csv", identified_bad_indexes, delimiter=",")
+    print(identified_bad_indexes)
+    np.savetxt("test/identified_bad.csv", identified_bad_indexes, delimiter=",", fmt="%d")

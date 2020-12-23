@@ -42,8 +42,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 #     return indices
 
 def sort_indices(pred_y, true_y):
-    closeness = [np.dot(pred_y[i], true_y[i]) for i in range(pred_y.shape[0])]
+    print("pred_y: ", pred_y)
+    print("true_y:", true_y)
+    closeness = [1 - np.dot(pred_y[i], true_y[i]) for i in range(pred_y.shape[0])]
     indices = np.argsort(closeness)
+    print("closeness: ", closeness)
+    print("indices: ", indices)
     return indices
 
 def get_unsupervised_features(X, saveToFile=False, filename="unsup_features.csv"):
@@ -61,7 +65,8 @@ def get_supervised_features(X, y, saveToFile=False, filename="sup_features.csv")
     return feat
 
 def get_NN_for_dataset(X, saveToFile=False, filename="nn.csv"):
-    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree', metric=cos_dis).fit(X)
+    #nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree', metric=cos_dis).fit(X)
+    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(X)
     distances, indices = nbrs.kneighbors(X)
     if saveToFile:
         np.savetxt(filename, feat, delimiter=",")
@@ -201,9 +206,11 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
 
     NUM_SAMPLES = X.shape[2]
 
-    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree', metric=cos_dis).fit(feat_same)
+    #nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree', metric=cos_dis).fit(feat_same)
+    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(feat_same)
     distances, nn_same = nbrs.kneighbors(feat_same)
-    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree', metric=cos_dis).fit(feat_diff)
+    #nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree', metric=cos_dis).fit(feat_diff)
+    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(feat_diff)
     distances, nn_diff = nbrs.kneighbors(feat_diff)
 
     #u, c = np.unique(y[:instance], return_counts=True)
