@@ -7,7 +7,7 @@ import sys
 import os.path
 import numpy as np
 from tsar import get_supervised_features, get_unsupervised_features, check_dataset, print_graph_for_instance_two_class
-from import_datasets import get_unimib_data, get_uci_data
+from import_datasets import get_unimib_data, get_uci_data, get_synthetic_set
 from sklearn.manifold import TSNE as tsne
 
 if __name__ == "__main__":
@@ -32,10 +32,12 @@ if __name__ == "__main__":
         exit()
 
     if set_name == "UniMiB":
-        X, y, labels = get_unimib_data("two_classes")
+        X, y, labels = get_unimib_data("adl")
         print("Unimib: ", len(X))
     elif set_name == "UCI":
         X, y, Labels = get_uci_data()
+    elif set_name == "synthetic":
+        X, y, labels = get_synthetic_set(1)
     else:
         print("Dataset must be UniMiB or UCI")
         exit()
@@ -72,5 +74,14 @@ if __name__ == "__main__":
     vis = tsne(n_components=2, n_jobs=8).fit_transform(features)
 
     for b in bad_guys:
-        file_name = "imgs/review/{}_{}_instance_{}.pdf".format(set_name, extractor, b)
+        file_name = "test/visualizations/{}_{}_instance_{}.pdf".format(set_name, extractor, b)
         print_graph_for_instance_two_class(X, y, labels, b, feat=features, vis=vis, show=False, saveToFile=True, filename=file_name)
+
+    a = 0
+    identified_bad_indexes = np.array([])
+    while a != -1:
+        a = input("Enter a bad index or -1 to stop: ")
+        if a != -1:
+            identified_bad_indexes = np.append
+
+    np.savetxt("test/identified_bad.csv", identified_bad_indexes, delimiter=",")

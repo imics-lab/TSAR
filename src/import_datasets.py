@@ -36,6 +36,15 @@ def get_uci_data():
     labels = labels[:-1]
     return X, y, labels
 
+def get_synthetic_set(num):
+    filename = "data/synthetic/synthetic_set" + str(num)
+    X = np.genfromtxt(filename+"_data.csv")
+    y = np.genfromtxt(filename+"_labels.csv")
+    labels = []
+    for i in range(len(y)):
+        labels.append("Class {}".format(i))
+    return X, y, labels
+
 if __name__ == "__main__":
     X, y, labels = get_unimib_data("two_classes")
     X, y, labels = get_uci_data()
