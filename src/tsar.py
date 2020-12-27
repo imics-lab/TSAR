@@ -42,12 +42,14 @@ from sklearn.metrics.pairwise import cosine_similarity
 #     return indices
 
 def sort_indices(pred_y, true_y):
-    print("pred_y: ", pred_y)
-    print("true_y:", true_y)
+    #print("pred_y: ", pred_y)
+    #print("true_y:", true_y)
     closeness = [np.dot(pred_y[i], true_y[i]) for i in range(pred_y.shape[0])]
+    #closeness = [cosine_similarity([pred_y[i]], [true_y[i]]) for i in range(pred_y.shape[0])]
+    #closeness = np.reshape(closeness, (pred_y.shape[0]))
     indices = np.argsort(closeness)
-    print("closeness: ", closeness)
-    print("indices: ", indices)
+    #print("closeness: ", closeness)
+    #print("indices: ", indices)
     return indices
 
 def get_unsupervised_features(X, saveToFile=False, filename="unsup_features.csv"):
@@ -324,7 +326,7 @@ def check_dataset(X, y, featureType='u', features=None):
     elif featureType=='o':
         feats, y = preprocess_raw_data_and_labels(X,y)
     elif featureType=='p':
-        feats, y = preprocess_raw_data_and_labels(features,y)
+        feats = features
     else:
         print("featureType must be u, s, p, or o")
         return
@@ -334,8 +336,8 @@ def check_dataset(X, y, featureType='u', features=None):
     #c.fit(feats, y, epochs=50, verbose=1, callbacks=[es], validation_split=0.1, batch_size=10)
 
     y_pred = c.predict(feats)
-
-    return sort_indices(y_pred, y)
+    indices = sort_indices(y_pred, y)
+    return indices, y_pred[indices]
 
 
 if __name__ == "__main__":

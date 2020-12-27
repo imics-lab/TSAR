@@ -25,9 +25,10 @@ def build_dnn(train_example, num_labels=2):
     model = Sequential([
         Input(shape=train_example.shape),
         BatchNormalization(scale=False),
-        Dense(128, activation='sigmoid'),
-        Dense(128, activation='sigmoid'),
-        Dense(64, activation='sigmoid'),
+        Dense(128, activation='relu'),
+        Dense(128, activation='relu'),
+        Dense(128, activation='relu'),
+        Dense(64, activation='relu'),
         Dense(num_labels, activation='softmax')
     ])
     model.compile(optimizer='RMSprop', loss='categorical_crossentropy', metrics=['acc'])
@@ -56,7 +57,7 @@ def train_dnn(dnn, X, y, withEvaluation=False):
 def get_trained_dnn(X, y):
     numLabels = y.shape[1]
     dnn = build_dnn(X[0], num_labels=numLabels)
-    dnn = train_dnn(dnn, X, y)
+    dnn = train_dnn(dnn, X, y, withEvaluation=True)
     return dnn
 
 if __name__ == "__main__":

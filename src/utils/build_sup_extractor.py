@@ -41,7 +41,7 @@ def build_sfe(train_example, features_per_channel=30, num_labels=2):
         Dense(features_per_channel*s[0]/2, activation='sigmoid'),
         Dense(num_labels, activation='softmax')
     ])
-    model.compile(optimizer='RMSprop', loss='mse', metrics=[])
+    model.compile(optimizer='RMSprop', loss='mse', metrics=['acc'])
     model.summary()
     print("Output shape: ", model.output.shape)
     return model
@@ -57,7 +57,7 @@ def train_sfe(sfe, X, y, withEvaluation=False):
     if withEvaluation:
         X, X_test, y, y_test = train_test_split(X, y, test_size=0.1, random_state=23)
 
-    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
+    es = EarlyStopping(monitor='val_acc', mode='min', verbose=1, patience=4)
     sfe.fit(X, y, epochs=100, verbose=1, callbacks=[es], validation_split=0.1, batch_size=10)
 
     if withEvaluation:

@@ -9,6 +9,8 @@ import numpy as np
 from tsar import get_supervised_features, get_unsupervised_features, check_dataset, print_graph_for_instance_two_class, preprocess_raw_data_and_labels
 from import_datasets import get_unimib_data, get_uci_data, get_synthetic_set
 from sklearn.manifold import TSNE as tsne
+from sklearn import svm
+from sklearn.model_selection import train_test_split
 
 if __name__ == "__main__":
     noise_percent = 0.05
@@ -42,6 +44,8 @@ if __name__ == "__main__":
         print("Dataset must be UniMiB or UCI")
         exit()
 
+    X, y = preprocess_raw_data_and_labels(X, y)
+
     print(y)
 
     if extractor == 'S':
@@ -58,8 +62,6 @@ if __name__ == "__main__":
         print("Feature extractor must be S or U")
         exit()
 
-    #preprocess_raw_data_and_labels(X, y)
-
     print("\n################ Reviewing {0}% of {1} ################".format(noise_percent*100, set_name))
     if extractor == 'S':
         print("################ Supervised ################\n")
@@ -67,24 +69,54 @@ if __name__ == "__main__":
         print("################ Unsupervised ################\n")
 
     print("{} instances in full dataset.".format(len(X)))
+    if not os.path.isfile("test/{}_identified_bad.csv".format(set_name)):
+        #features = np.genfromtxt("data/"+set_name+"_sup_feat.csv", delimiter=',')
+        indices, pLabels = check_dataset(X, y, featureType='p', features=features)
+        number_of_bad_guys = int(noise_percent*X.shape[0])
+        print("Generating graphs for {} worst instances".format(number_of_bad_guys))
 
-    indices = check_dataset(X, y, featureType='p', features=features)
-    number_of_bad_guys = int(noise_percent*X.shape[0])
-    print("Generating graphs for {} worst instances".format(number_of_bad_guys))
+        bad_guys = indices[:number_of_bad_guys]
+        vis = tsne(n_components=2, n_jobs=8).fit_transform(features)
 
-    bad_guys = indices[:number_of_bad_guys]
-    vis = tsne(n_components=2, n_jobs=8).fit_transform(features)
+        log = open("test/test_log.txt", 'w+')
 
-    for b in bad_guys:
-        file_name = "test/visualizations/{}_{}_instance_{}.pdf".format(set_name, extractor, b)
-        print_graph_for_instance_two_class(X, y, labels, b, feat=features, vis=vis, show=False, saveToFile=True, filename=file_name)
+        for b in bad_guys:
+            file_name = "test/visualizations/{}_{}_instance_{}.pdf".format(set_name, extractor, b)
+            print_graph_for_instance_two_class(X, y, labels, b, feat=features, vis=vis, show=False, saveToFile=True, filename=file_name)
+            log.write("Instance index: {}\n".format(b))
+            log.write("Assigned label: {}\n".format(y[b]))
+            log.write("Predicted label: {}\n".format(np.argmax(pLabels[b])))
+            log.write("<><><><><><><><><><><><><><>\n\n")
+            log.flush()
 
-    a = 0
-    identified_bad_indexes = np.array([])
-    while a != -1:
-        a = int(input("Enter a bad index or -1 to stop: "))
-        if a != -1:
-            identified_bad_indexes = np.append(identified_bad_indexes, a)
+        log.close()
 
-    print(identified_bad_indexes)
-    np.savetxt("test/identified_bad.csv", identified_bad_indexes, delimiter=",", fmt="%d")
+        a = 0
+        identified_bad_indexes = np.array([])
+        while a != -1:
+            a = int(input("Enter a bad index or -1 to stop: "))
+            if a != -1:
+                identified_bad_indexes = np.append(identified_bad_indexes, a)
+
+        print(identified_bad_indexes)
+        np.savetxt("test/{}_identified_bad.csv".format(set_name), identified_bad_indexes, delimiter=",", fmt="%d")
+    else:
+        identified_bad_indexes = np.genfromtxt("test/{}_identified_bad.csv".format(set_name), delimiter=',', dtype='int32')
+
+    print("Shape of X = ", features.shape)
+
+    clean_X = np.delete(features, identified_bad_indexes, 0)
+    clean_y = np.delete(y, identified_bad_indexes, 0)
+    print("Cleaned feature set now has {} instances".format(len(clean_X)))
+    print("Cleaned label set now has {} instances".format(len(clean_y)))
+    print("Uncleaned feature set still has {} instances".format(len(X)))
+
+    noisy_classifier = svm.LinearSVC(verbose=1, dual=False)
+    clean_classifier = svm.LinearSVC(verbose=1, dual=False)
+    noisy_X_train, noisy_X_test, noisy_y_train, noisy_y_test = train_test_split(features, y, test_size=0.2, shuffle=True)
+    clean_X_train, clean_X_test,clean_y_train, clean_y_test = train_test_split(clean_X, clean_y, test_size=0.2, shuffle=True)
+
+    print("Y argmax = ", np.argmax(noisy_y_train, axis=-1))
+
+    noisy_classifier.fit(noisy_X_train, np.argmax(noisy_y_train, axis=-1))
+    clean_classifier.fit(clean_X_train, np.argmax(clean_y_train, axis=-1))
