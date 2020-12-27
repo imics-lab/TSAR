@@ -11,6 +11,7 @@ from import_datasets import get_unimib_data, get_uci_data, get_synthetic_set
 from sklearn.manifold import TSNE as tsne
 from sklearn import svm
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 if __name__ == "__main__":
     noise_percent = 0.05
@@ -111,8 +112,8 @@ if __name__ == "__main__":
     print("Cleaned label set now has {} instances".format(len(clean_y)))
     print("Uncleaned feature set still has {} instances".format(len(X)))
 
-    noisy_classifier = svm.LinearSVC(verbose=1, dual=False)
-    clean_classifier = svm.LinearSVC(verbose=1, dual=False)
+    noisy_classifier = svm.LinearSVC(verbose=0, dual=False)
+    clean_classifier = svm.LinearSVC(verbose=0, dual=False)
     noisy_X_train, noisy_X_test, noisy_y_train, noisy_y_test = train_test_split(features, y, test_size=0.2, shuffle=True)
     clean_X_train, clean_X_test,clean_y_train, clean_y_test = train_test_split(clean_X, clean_y, test_size=0.2, shuffle=True)
 
@@ -120,3 +121,14 @@ if __name__ == "__main__":
 
     noisy_classifier.fit(noisy_X_train, np.argmax(noisy_y_train, axis=-1))
     clean_classifier.fit(clean_X_train, np.argmax(clean_y_train, axis=-1))
+
+    noisy_y_pred = noisy_classifier.predict(noisy_X_test)
+    clean_y_pred = clean_classifier.predict(clean_X_test)
+
+    #cleaned_accuracy_as_ts[iter_num] = accuracy_score(y_test, y_pred, normalize=True)
+
+    noisy_acc = accuracy_score(np.argmax(noisy_y_test, axis=-1), noisy_y_pred)
+    clean_acc = accuracy_score(np.argmax(clean_y_test, axis=-1), clean_y_pred)
+
+    print("Noisy accuracy: ", noisy_acc)
+    print("Cleaned accuracy: ", clean_acc)
