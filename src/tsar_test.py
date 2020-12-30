@@ -86,7 +86,7 @@ if __name__ == "__main__":
             print_graph_for_instance_two_class(X, y, labels, b, feat=features, vis=vis, show=False, saveToFile=True, filename=file_name)
             log.write("Instance index: {}\n".format(b))
             log.write("Assigned label: {}\n".format(y[b]))
-            log.write("Predicted label: {}\n".format(np.argmax(pLabels[b])))
+            log.write("Predicted label: {}\n".format(np.argmax(pLabels[b], axis=-1)))
             log.write("<><><><><><><><><><><><><><>\n\n")
             log.flush()
 
@@ -116,8 +116,6 @@ if __name__ == "__main__":
     clean_classifier = svm.LinearSVC(verbose=0, dual=False)
     noisy_X_train, noisy_X_test, noisy_y_train, noisy_y_test = train_test_split(features, y, test_size=0.2, shuffle=True)
     clean_X_train, clean_X_test,clean_y_train, clean_y_test = train_test_split(clean_X, clean_y, test_size=0.2, shuffle=True)
-
-    print("Y argmax = ", np.argmax(noisy_y_train, axis=-1))
 
     noisy_classifier.fit(noisy_X_train, np.argmax(noisy_y_train, axis=-1))
     clean_classifier.fit(clean_X_train, np.argmax(clean_y_train, axis=-1))

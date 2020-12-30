@@ -40,7 +40,7 @@ def train_dnn(dnn, X, y, withEvaluation=False):
     if withEvaluation:
         X, X_test, y, y_test = train_test_split(X, y, test_size=0.1, random_state=23)
 
-    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
+    es = EarlyStopping(monitor='val_acc', mode='max', verbose=1, patience=4)
     dnn.fit(X, y, epochs=100, verbose=1, callbacks=[es], validation_split=0.1, batch_size=10)
 
     if withEvaluation:
