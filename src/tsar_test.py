@@ -46,8 +46,9 @@ if __name__ == "__main__":
         exit()
 
     X, y = preprocess_raw_data_and_labels(X, y)
+    np.savetxt("test/{}_shuffeled_labels.csv".format(set_name), y, delimiter=",", fmt="%d")
 
-    print(y)
+    #print(y)
 
     if extractor == 'S':
         if os.path.isfile("data/"+set_name+"_sup_feat.csv"):
