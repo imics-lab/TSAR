@@ -5,7 +5,6 @@
 #Hurray! First code file of the new year
 
 import matplotlib.pyplot as plt
-import numpy as np
 import seaborn
 
 #credit to https://onestopdataanalysis.com/confusion-matrix-python/ for a handy func
