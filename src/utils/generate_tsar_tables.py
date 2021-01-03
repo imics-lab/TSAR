@@ -27,7 +27,6 @@ if __name__ == "__main__":
             Precision=["65.9%", "77.7%", "63.6%", "70.4%", "64.3%", "60.0%", "61.9%"]
         )
     )
-
     out.write(deep_ind_acc.to_latex(index=False))
 
     voting_acc = pd.DataFrame(
@@ -39,6 +38,14 @@ if __name__ == "__main__":
             Precision=["70.5%", "76.3%", "100.0%", "77.8%", "88.2%", "75.0%", "61.5%", "66.7%"]
         )
     )
-
     out.write(voting_acc.to_latex(index=False))
+
+    model_acc = pd.DataFrame(
+        dict(
+            Model = ["SVM", "KNN", "Decision Tree", "Naive Bayes"],
+            NAccuracy=["96.4%", "96.7%", "94.6%", "93.3%"],
+            CAccuracy=["97.8%", "97.8%", "96.6%", "96.2%"]
+        )
+    )
+    out.write(model_acc.to_latex(index=False))
     out.close()
