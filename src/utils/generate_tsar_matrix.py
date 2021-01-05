@@ -20,22 +20,26 @@ def plot_confusion_matrix(data, labels, output_filename):
     seaborn.set(color_codes=True)
     plt.figure(1, figsize=(9, 6))
 
+    plt.rc('font', size=64)
+
     plt.title("")
 
-    seaborn.set(font_scale=1.4)
-    ax = seaborn.heatmap(data, annot=True, cmap="YlGnBu", cbar_kws={'label': 'Scale'}, fmt='g')
+    seaborn.set(font_scale=2.3)
+    ax = seaborn.heatmap(data, annot=True, cmap="YlGnBu", cbar=False, fmt='g')
 
     ax.set_xticklabels(labels)
     ax.set_yticklabels(labels)
 
     ax.set(ylabel="Reviewer Response", xlabel="True Value")
 
+    #plt.legend()
+
     plt.savefig(output_filename, bbox_inches='tight', dpi=300)
     plt.close()
 
 if __name__ == "__main__":
     test = [[1., 2.], [3., 4.]]
-    total_ind_responses = np.array([[407, 158], [313, 562]], dtype='int32')
+    total_ind_responses = [[407, 158], [313, 562]]
     total_vote__responses = [[30,5],[18,43]]
     deep_ind_responses = [[286, 105],[194,375]]
     deep_vote_responses =[[23, 3], [9,29]]
