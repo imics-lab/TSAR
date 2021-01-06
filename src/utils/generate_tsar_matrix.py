@@ -20,15 +20,16 @@ def plot_confusion_matrix(data, labels, output_filename):
     seaborn.set(color_codes=True)
     plt.figure(1, figsize=(9, 6))
 
-    plt.rc('font', size=64)
+    plt.rc('font', size=32)
+    plt.rcParams["axes.labelsize"] = 26
 
     plt.title("")
 
     seaborn.set(font_scale=2.3)
     ax = seaborn.heatmap(data, annot=True, cmap="YlGnBu", cbar=False, fmt='g')
 
-    ax.set_xticklabels(labels)
-    ax.set_yticklabels(labels)
+    ax.set_xticklabels(labels, fontsize=22)
+    ax.set_yticklabels(labels, fontsize=22)
 
     ax.set(ylabel="Reviewer Response", xlabel="True Value")
 
