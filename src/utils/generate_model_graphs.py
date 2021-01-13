@@ -6,10 +6,10 @@
 import tensorflow as tf
 from tensorflow import keras
 import tensorboard
-from build_AE import get_trained_AE
+from build_AE import build_AE
 from scipy.io import loadmat
 import numpy as np
-import datatime
+from datetime import datetime
 
 def get_unimib_data(s="acc"):
     print("Loading UniMiB set ", s)
@@ -33,7 +33,9 @@ def get_unimib_data(s="acc"):
 if __name__ == "__main__":
     print("Trained Autoencoder")
     X, y, labels = get_unimib_data("adl")
-    model = get_trained_AE(X)
+    model = build_AE(X[0])
 
     logdir="logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
+
+    model.fit(X, X, callbacks=[tensorboard_callback], epochs=5)

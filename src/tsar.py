@@ -235,11 +235,30 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     ax3 = plt.subplot2grid((3,4), (1, 3))
     ax4 = plt.subplot2grid((3,4), (2, 3))
 
+    for i in range(X.shape[1]):
+        ax2.plot(range(0, NUM_SAMPLES), X[instance, i, :], c=pal[0])
+    ax2.set_title("Suspicious point has label: " + str(labels[same_label]), fontsize=18)
+
+    for i in range(X.shape[1]):
+        ax3.plot(range(0, NUM_SAMPLES), X_same[nn_same[same_instance, 1], i, :], c=pal[0])
+    ax3.set_title("Nearest neighbor with label: " + str(labels[same_label]), fontsize=18)
+
+    for i in range(X.shape[1]):
+        ax4.plot(range(0, NUM_SAMPLES), X_diff[nn_diff[-1, 1], i, :], c=pal[1])
+    ax4.set_title("Nearest neighbor with label: " + str(labels[diff_label]), fontsize=18)
+
     if(len(vis[0])==2):
         #print("2d tSNE")
         x = np.where(y==same_label)
         ax1.scatter(vis[x, 0], vis[x, 1], s=6, c=pal[0], marker="^")
         x = np.where(y==diff_label)
+
+        #"zoom in" the plot
+        #plt.xlim(vis[instance,0]-0.5, vis[instance,0]+0.5)
+        #plt.xlim(vis[instance,1]-0.5,vis[instance,1]+0.5)
+        ax1.set_xlim(vis[instance,0]-100, vis[instance,0]+100)
+        ax1.set_ylim(vis[instance,1]-100, vis[instance,1]+100)
+
         ax1.scatter(vis[x, 0], vis[x, 1], s=10, c=pal[1], marker=".")
         ax1.scatter(vis[instance, 0], vis[instance, 1], s=300, c='black', marker="X")
         ax1.scatter(vis[instance, 0], vis[instance, 1], s=200, c=pal[0], marker="X", label="Suspicious Point")
@@ -264,18 +283,6 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
     else:
         print("tSNE points have an unusual number of dimensions")
         return
-
-    for i in range(X.shape[1]):
-        ax2.plot(range(0, NUM_SAMPLES), X[instance, i, :], c=pal[0])
-    ax2.set_title("Suspicious point has label: " + str(labels[same_label]), fontsize=18)
-
-    for i in range(X.shape[1]):
-        ax3.plot(range(0, NUM_SAMPLES), X_same[nn_same[same_instance, 1], i, :], c=pal[0])
-    ax3.set_title("Nearest neighbor with label: " + str(labels[same_label]), fontsize=18)
-
-    for i in range(X.shape[1]):
-        ax4.plot(range(0, NUM_SAMPLES), X_diff[nn_diff[-1, 1], i, :], c=pal[1])
-    ax4.set_title("Nearest neighbor with label: " + str(labels[diff_label]), fontsize=18)
 
     plt.tight_layout()
 
