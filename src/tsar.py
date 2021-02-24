@@ -41,17 +41,21 @@ from sklearn.metrics.pairwise import cosine_similarity
 #     indices = np.argsort(dots)
 #     return indices
 
+#Sort indices
+#Parameters:
+#   label vectors predicted by check_dataset
+#   label vectors from dataset
+#Returns: the sorted indexes by magnitude of dot product between two parameters
 def sort_indices(pred_y, true_y):
-    #print("pred_y: ", pred_y)
-    #print("true_y:", true_y)
     closeness = [np.dot(pred_y[i], true_y[i]) for i in range(pred_y.shape[0])]
-    #closeness = [cosine_similarity([pred_y[i]], [true_y[i]]) for i in range(pred_y.shape[0])]
-    #closeness = np.reshape(closeness, (pred_y.shape[0]))
     indices = np.argsort(closeness)
-    #print("closeness: ", closeness)
-    #print("indices: ", indices)
     return indices
 
+#Get Unsupervised features
+#Parameters:
+#   2 or 3d array of instances
+#Returns: a 2d array of features learned by a convolutional autoencoder
+#See utils.build_AE
 def get_unsupervised_features(X, saveToFile=False, filename="unsup_features.csv"):
     ae = get_trained_AE(X, withVisual=False)
     feat = ae.predict(X)
@@ -59,6 +63,12 @@ def get_unsupervised_features(X, saveToFile=False, filename="unsup_features.csv"
         np.savetxt(filename, feat, delimiter=",")
     return feat
 
+#Get Supervised Features
+#Parameters
+#   2 or 3d array of instances
+#   label arrays from dataset
+#Returns: a 2d array of features learned by a truncated CNN
+#See utils.build_sup_extractor
 def get_supervised_features(X, y, saveToFile=False, filename="sup_features.csv"):
     sfe = get_trained_sfe(X, y)
     feat = sfe.predict(X)
@@ -66,6 +76,10 @@ def get_supervised_features(X, y, saveToFile=False, filename="sup_features.csv")
         np.savetxt(filename, feat, delimiter=",")
     return feat
 
+#Get NearestNeighbors for Dataset
+#Parameters:
+#   a 2 or 3d array of instances
+#Returns: a list of indexes of the 1 nearest neighbor for each instance
 def get_NN_for_dataset(X, saveToFile=False, filename="nn.csv"):
     #nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree', metric=cos_dis).fit(X)
     nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(X)
@@ -74,6 +88,11 @@ def get_NN_for_dataset(X, saveToFile=False, filename="nn.csv"):
         np.savetxt(filename, feat, delimiter=",")
     return indices
 
+#Preprocess Raw Data and Labels
+#Parameters:
+#   a 2 or 3d array of instances
+#   labels from dataset, either one-hot or class
+#Returns: normalized instances and label vectors, both shuffled
 def preprocess_raw_data_and_labels(X, y):
     print("Applying pre-processing")
     if len(X) != len(y):
@@ -88,11 +107,13 @@ def preprocess_raw_data_and_labels(X, y):
 
     return X,y
 
+#Returns the inverse of cosine simalarity
 def cos_dis(x,y):
     X = [x]
     Y = [y]
     d = cosine_similarity(X, Y)
     return 1 - d
+
 
 def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, vis=None, show=False, saveToFile=False, filename="graph.pdf", mislabeled=False):
     #X, y = preprocess_raw_data_and_labels(X, y)
