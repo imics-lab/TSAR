@@ -114,7 +114,15 @@ def cos_dis(x,y):
     d = cosine_similarity(X, Y)
     return 1 - d
 
-
+#Print Graph For Instance
+#Parameters:
+#   2 or 3d array of instances
+#   label vectors from dataset
+#   the index of one instance from X
+#   a feature set learned from X (optional)
+#   a tSNE reduction of X(optional)
+#Returns: nothing
+#Saves one pdf visualization of instance in X with all classes represented
 def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, vis=None, show=False, saveToFile=False, filename="graph.pdf", mislabeled=False):
     #X, y = preprocess_raw_data_and_labels(X, y)
     if y.ndim>=2:
@@ -185,6 +193,15 @@ def print_graph_for_instance(X, y, labels, instance, feat=None, neighbors=None, 
     if show:
         plt.show()
 
+#Print Graph For Instance Two Class
+#Parameters:
+#   2 or 3d array of instances
+#   label vectors from dataset
+#   the index of one instance from X
+#   a feature set learned from X (optional)
+#   a tSNE reduction of X(optional)
+#Returns: nothing
+#Saves one pdf visualization of instance in X with only 2 "nearest" classes represented
 def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=None, show=False, saveToFile=False, filename="graph.pdf", mislabeled=False):
     if y.ndim>=2:
         #print("Converting labels from One-Hot")
@@ -315,6 +332,13 @@ def print_graph_for_instance_two_class(X, y, labels, instance, feat=None, vis=No
 
     return
 
+#Add Noise to Labels
+#Parameters:
+#   a set of labels
+#   a percent of labels to alter as a whole number
+#Returns: a classwise (not one-hot) set of altered labels, a set of indexes representing the
+#   altered labels
+#Labels are altered in a uniformally at random fashion
 def add_noise_to_labels(y, percentNoise=5, saveToFile=False, filename="noisy_labels.csv"):
     bad = np.array([], dtype='int')
     NUM_LABELS = int(np.max(y)+1)
@@ -331,6 +355,7 @@ def add_noise_to_labels(y, percentNoise=5, saveToFile=False, filename="noisy_lab
     print(len(bad), " bad idices added")
     return y, bad
 
+#Count Class Imbalance
 def count_class_imbalance(y):
     if y.ndim == 1:
         y = to_categorical(y)
@@ -341,6 +366,15 @@ def count_class_imbalance(y):
         counts[i] = np.sum(y[:,i])
     return np.max(counts)/np.min(counts)
 
+#Check Dataset
+#Parameters:
+#   a 2 or 3d array of instances
+#   list of one-hot labels
+#   the style of feature to use:
+#       'u'nsupervised
+#       's'supervised
+#       'o'riginal (no feature extraction)
+#       'p're-processed
 def check_dataset(X, y, featureType='u', features=None):
     print("Checking dataset for suspicious labels")
     if featureType=='u':
