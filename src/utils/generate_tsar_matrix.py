@@ -26,7 +26,7 @@ def plot_confusion_matrix(data, labels, output_filename):
     plt.title("")
 
     seaborn.set(font_scale=2.3)
-    cm = sns.color_palette("light:b", as_cmap=True)
+    cm = seaborn.color_palette("light:b", as_cmap=True)
     #ax = seaborn.heatmap(data, annot=True, cmap="YlGnBu", cbar=False, fmt='g')
     ax = seaborn.heatmap(data, annot=True, cmap=cm, cbar=False, fmt='g')
 
