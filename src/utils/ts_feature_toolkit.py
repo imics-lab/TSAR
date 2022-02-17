@@ -10,6 +10,11 @@ import numpy as np
 from tsfresh.feature_extraction import feature_calculators as fc
 from tsfresh.utilities.dataframe_functions import impute
 
+class Signal:
+    def __init__(self, signal, label):
+        self.signal = signal
+        self.label = label
+
 def get_normalized_signal_energy(X):
     return np.mean(np.square(X))
 
