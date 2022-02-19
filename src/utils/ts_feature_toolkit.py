@@ -9,8 +9,13 @@ from scipy import signal
 import numpy as np
 from tsfresh.feature_extraction import feature_calculators as fc
 from tsfresh.utilities.dataframe_functions import impute
+from dataclasses import dataclass
 
+@dataclass()
 class Signal:
+    signal: list
+    label: int
+
     def __init__(self, signal, label):
         self.signal = signal
         self.label = label
