@@ -21,8 +21,24 @@ class Signal:
     label: int
 
     def __init__(self, signal, label):
-        self.signal = signal
+        self.signal = np.array(signal)
         self.label = label
+
+    def __init__(self):
+        self.signal = np.array([])
+        self.label = np.NaN
+    
+    def __init__(self, other):
+        self.signal = other.signal.copy()
+        self.label = other.label
+    
+    def getMean(self):
+        return np.mean(self.signal)
+
+    def normalize(self):
+        m = np.max([abs(i) for i in self.signal])
+        self.signal = [i/m for i in self.signal]
+
 
 """
 Calculate Apparent Error Rate

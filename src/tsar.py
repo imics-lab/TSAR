@@ -362,7 +362,7 @@ def count_class_imbalance(y):
 
     counts = np.zeros(len(y[0]))
     for i in range(len(y[0])):
-        print(np.sum(y[:,i]))
+        #print(np.sum(y[:,i]))
         counts[i] = np.sum(y[:,i])
     return np.max(counts)/np.min(counts)
 
