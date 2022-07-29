@@ -12,3 +12,17 @@ A deep neural network is trained on an appropriate dataset and then predicts a l
 TSAR uses several tricks to make your data more interpretable. The first is to generate rich feature sets using deep feature learners (that's where the CNN come in) and to use that feature set and tSNE to produce a scatter plot of some instances from your data (either all instances or only the two most likelty correct classes. The latter is less cluttered and is prefered by this team). Mislabeled point in this scatter plot will often fall into a miscolored region of the plot. The visualization also includes three waveforms. The first is the instance being reviewed. Second the nearest neighbor in the feature set with the SAME label, Third the nearest neighbor in the feature set with a DIFFERENT label.# tsar: Time Series Automated Re-labeling
 
 This work is licensed under Creative Commons Attribution 4.0 International Public License. Please consult the license file for more information about permitted activities and requirements. 
+
+## Cite
+
+Atkinson, G., & Metsis, V. (2021, June). TSAR: a time series assisted relabeling tool for reducing label noise. In The *14th PErvasive Technologies Related to Assistive Environments Conference* (pp. 203-209).
+
+<pre>
+@inproceedings{atkinson2021tsar,
+  title={TSAR: a time series assisted relabeling tool for reducing label noise},
+  author={Atkinson, Gentry and Metsis, Vangelis},
+  booktitle={The 14th PErvasive Technologies Related to Assistive Environments Conference},
+  pages={203--209},
+  year={2021}
+}
+</pre>
